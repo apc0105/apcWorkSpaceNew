@@ -1,15 +1,14 @@
 import request from '@/utils/request'
-const prefix = 'web/PageHome/'
-import store from '@/store'
+const prefix = 'TKNewsServlet/'
 
-export function getRecommend(filter) {
-  return request.post(prefix + 'getRecommend/?token='+store.getters.token, filter)
+export function smartSearch(searchValue) {
+  return request.post(prefix + 'SmartSearch?searchValue='+searchValue)
 }
-export function getHistoricalRecords(filter) {
-  return request.post(prefix + 'getHistoricalRecords/?token='+store.getters.token, filter)
+export function smartSearchPage(pageNumber,token) {
+  return request.post(prefix + 'SmartSearchPage?page='+pageNumber+'&token='+token)
 }
-export function closeSerMess(filter) {
-  return request.post(prefix + 'closeSerMess/?token='+store.getters.token, filter)
+export function smartSearchEdge(code,token) {
+  return request.post(prefix + 'SmartSearchEdge?code='+code+'&token='+token)
 }
 
 

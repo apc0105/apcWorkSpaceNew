@@ -50,7 +50,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../taibao'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/taibao/',
+    assetsPublicPath: './',
 
     /**
      * Source Maps

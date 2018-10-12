@@ -16,10 +16,10 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(config => {
   // Do something before request is sent
-  if (typeof(store.getters.token) != 'undefined') {
-    // 让每个请求携带token-- ['auth-token']为自定义key 请根据实际情况自行修改
-    config.headers['Authorization'] = store.getters.token;
-  }
+  // if (typeof(store.getters.token) != 'undefined') {
+  //   // 让每个请求携带token-- ['auth-token']为自定义key 请根据实际情况自行修改
+  //   config.headers['Authorization'] = store.getters.token;
+  // }
   return config
 }, error => {
   // Do something with request error
@@ -36,8 +36,8 @@ service.interceptors.response.use(
    * 以下代码均为样例，请结合自生需求加以修改，若不需要，则可删除
    */
   response => {
-    const res = response.data
-    if (res.code !== 1) {
+    const res = response
+    if (res.status !== 200) {
       Message({
         message: res.msg,
         type: 'error',
@@ -49,9 +49,9 @@ service.interceptors.response.use(
     }
   },
   error => {
-    if(!error.response){
+    if (!error.response) {
       Message.error("无法连接服务器");
-    }else if (error.response.status === 401) {
+    } else if (error.response.status === 401) {
       router.push('/login')
       Message.error(error.response.data.msg)
     } else if (error.response.status === 403) {

@@ -6,17 +6,18 @@
       <el-button type="text" v-else @click="show=false">收起</el-button>
 
     </p>-->
-  <div id="myDiagramDiv" v-show="show"></div>
+  <div id="myDiagramDiv" class="myDiagramDiv" v-show="show" ref="myDiagramDivRef"></div>
 
 </template>
 
 <script>
-
+  import {smartSearchEdge} from '@/api/homePage'
   import go from 'gojs';
   import datam from './data';
   var $ = go.GraphObject.make;
 
   export default{
+    props: ["record"],
     mixins: [datam],
     data(){
       return {
@@ -25,7 +26,10 @@
       }
     },
     mounted(){
-      this.load();
+      var that = this;
+      this.initData(function () {
+        that.load();
+      });
     },
     methods: {
       load(){
@@ -48,9 +52,8 @@
           bluegrad: $(go.Brush, "Linear", {0: "#B0E0E6", 1: "#87CEEB"}),
           redgrad: $(go.Brush, "Linear", {0: "#C45245", 1: "#871E1B"}),
           whitegrad: $(go.Brush, "Linear", {0: "#F0F8FF", 1: "#E6E6FA"}),
-          bigfont: "bold 8pt Helvetica, Arial, sans-serif",
+          bigfont: "bold 10pt Helvetica, Arial, sans-serif",
           smallfont: "bold 6pt Helvetica, Arial, sans-serif",
-
         }
 
         return options;
@@ -144,6 +147,30 @@
             $(go.TextBlock, this.textStyle(), new go.Binding("text", "text").makeTwoWay())
           ));
       },
+      initData(callback){
+        var that = this;
+        var token = sessionStorage.getItem('token');
+        smartSearchEdge(this.record.code, token).then(resp => {
+          this.changeNodes(resp.data.nodes, resp.data.edges);
+          callback();
+        })
+      },
+      changeNodes(nodes, edges){
+        for (var i = 0; i < nodes.length; i++) {
+          var node = {"key": nodes[i], "category": "Supplier", "text": nodes[i]};
+          this.myjson.nodeDataArray.push(node);
+        }
+
+        for (var i = 0; i < edges.length; i++) {
+          var edge = edges[i];
+          var link = {"from": edge.node_in, "to": edge.node_out};
+          this.myjson.linkDataArray.push(link);
+        }
+      },
+      reloadProcess(){
+        this.myjson.nodeDataArray = [];
+        this.myjson.linkDataArray = [];
+      }
 
     }
 
@@ -160,8 +187,8 @@
     padding: 5px;
   }
 
-  #myDiagramDiv {
-    width: 556px;
+  .myDiagramDiv {
+    width: auto;
     height: 200px;
     border: solid 1px #d3d3d3;
   }
