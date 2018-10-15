@@ -79,7 +79,8 @@
               "linkingTool.direction": go.LinkingTool.ForwardsOnly,
               initialContentAlignment: go.Spot.Center,
               layout: $(go.LayeredDigraphLayout, {isInitial: false, isOngoing: false, layerSpacing: 30}),
-              "undoManager.isEnabled": true
+              "undoManager.isEnabled": true,
+              "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,
             });
         //默认节点模板
         this.myDiagram.nodeTemplate =
@@ -189,7 +190,7 @@
 
   .myDiagramDiv {
     width: auto;
-    height: 200px;
+    min-height: 400px;
     border: solid 1px #d3d3d3;
   }
 

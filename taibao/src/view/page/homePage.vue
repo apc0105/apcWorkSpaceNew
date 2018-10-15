@@ -53,7 +53,7 @@
 
     </div>
 
-    <el-dialog :title="record.name" v-if="dialogTableVisible" :visible.sync="dialogTableVisible" width="70%"
+    <el-dialog :title="record.name" v-if="dialogTableVisible" :visible.sync="dialogTableVisible" width="90%"
                @close="closeDialog">
       <process-go v-bind:record="record" ref="processGoPage"></process-go>
     </el-dialog>
