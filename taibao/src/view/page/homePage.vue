@@ -8,7 +8,7 @@
       <div class=" srcon clearfix" style="">
         <div ref="serinp" id="serinp" class="searchl" @click="handleshow($event)">
           <el-input v-model="shiftName" @focus="handleinput($event)"
-                    @input.native="handleinput($event),search($event)" @keyup.enter.native="enter($event)">
+                    @input.native="handleinput($event),search(1)" @keyup.enter.native="enter($event)">
           </el-input>
           <!--<div class="sod"></div>-->
           <div class="sc" id="sermess" ref="sermess">
@@ -24,13 +24,14 @@
                   </div>-->
           </div>
         </div>
-        <div class="searchButton" @click="search()">
+        <div class="searchButton" @click="search(0)">
           泰宝一下
         </div>
       </div>
 
       <div ref="serres" class="home_width clearfix" style="display: none;">
-        <div class="scomm">泰宝为您找到受影响公司结果约 <em>{{totalNum}}</em> 个。<span class="z">正面影响力</span><span class="f">负面影响力</span></div>
+        <div class="scomm">泰宝为您找到受影响公司结果约 <em>{{totalNum}}</em> 个。<span class="z">正面影响力</span><span
+          class="f">负面影响力</span></div>
         <div class="scommcon">
           <dl>
             <dt class="tit">公司名称</dt>
@@ -251,6 +252,7 @@
 <script>
   import {smartSearch, smartSearchPage, smartSearchEdge} from '@/api/homePage'
   import processGo from '@/components/process-go'
+  import NProgress from 'nprogress'
 
   document.addEventListener('click', function () {
     document.getElementById('sermess').style.display = "none";
@@ -270,13 +272,14 @@
     data () {
       return {
         shiftName: '',
-        historicalRecordsList: ["油价", "金价", "铁价"],
+        historicalRecordsList: ["原油", "黄金勘察", "铁矿石"],
+        historicalRecordsListSize: 20,
         dialogTableVisible: false,
         searchResultVisible: false,
         smartSearchList: [],
         totalPageNumber: 1,
         currentPage: 1,
-        totalNum:0,
+        totalNum: 0,
         token: '',
         record: {
           name: '',
@@ -288,21 +291,28 @@
 
     },
     methods: {
-      search(e){
-        if (/^[\u4e00-\u9fa5]/g.test(this.shiftName) || this.shiftName.length > 0) {
-          this.initPage(this.shiftName);
+      search(isFoc){
+        var that = this;
+        if ((/^[\u4e00-\u9fa5]/g.test(this.shiftName) || this.shiftName.length > 0) && isFoc == 0) {
+          NProgress.inc(0.2);
+          NProgress.configure({easing: 'ease', speed: 500});
+          NProgress.start();
 
-          this.$refs.sermess.style.display = 'none';
-          this.$refs.s_search.className = "s_search s_ani_d";
-          this.$refs.serres.className = "home_width clearfix";
+          this.initPage(this.shiftName, function () {
+            that.$refs.sermess.style.display = 'none';
+            that.$refs.s_search.className = "s_search s_ani_d";
+            that.$refs.serres.className = "home_width clearfix";
 
-          setTimeout(() => {
-            this.$refs.serres.style.display = 'block';
-          }, 200)
+            setTimeout(() => {
+              NProgress.done();
+              that.$refs.serres.style.display = 'block';
+            }, 200)
+          });
         } else {
           this.$refs.serres.style.display = 'none';
           this.$refs.s_search.className = "s_search s_ani_h";
           this.$refs.serres.className = "home_width clearfix s_ani_sh0";
+          this.totalNum = 0;
         }
 
       },
@@ -312,9 +322,9 @@
         if (el.innerText != "" && el.innerText != undefined) {
           that.$refs.sermess.style.display = 'none';
         } else {
-          var querystring = require('querystring');
-          this.$refs.sermess.style.display = 'block';
+          that.$refs.sermess.style.display = 'block';
         }
+
       },
       closeSerMess(e){
         e.stopPropagation();
@@ -333,7 +343,7 @@
         var el = e.target.value;
         this.searchValue = el;
         this.$refs.sermess.style.display = 'none';
-        this.search()
+        this.search(0);
       },
       handleshow(e) {
         e.stopPropagation();
@@ -344,18 +354,40 @@
         this.record.name = item.name;
         this.record.code = item.code;
         this.dialogTableVisible = true;
+        /*var that = this;
+        setTimeout(() => {
+          that.$refs.processGoPage.initData(function () {
+            this.$refs.processGoPage.load();
+          });
+        }, 200)*/
+
       },
       closeDialog(){
         this.dialogTableVisible = false;
       },
-      initPage(searchValue){
+      initPage(searchValue, callback){
         smartSearch(searchValue).then(resp => {
           this.smartSearchList = resp.data.nodes;
           this.totalPageNumber = resp.data.total_page;
           this.currentPage = resp.data.current_page;
-          this.totalNum = resp.data.total_num;
+
+          if (resp.data.total_num != null) {
+            this.totalNum = resp.data.total_num;
+            console.log("height",this.$refs.sermess);
+            if (this.historicalRecordsList.indexOf(searchValue) == -1) {
+
+              this.historicalRecordsList.splice(3, 0, searchValue);
+              this.$refs.sermess.style.height="160px";
+              this.$refs.sermess.style.overflow="auto";
+              if (this.historicalRecordsList.length > this.historicalRecordsListSize) {
+                this.historicalRecordsList.pop();
+              }
+            }
+
+          }
           this.token = resp.data.token;
           sessionStorage.setItem('token', this.token);
+          callback();
         })
       },
       numChangeStar(num){
@@ -367,37 +399,37 @@
         var fSpan = '<span class="f"></span>';
         var fbSpan = '<span class="fb"></span>';
 
-        if (num == 0.0 || num == 0) {
+        if ((num < 0.5 && num > 0) || num == 0.0 || num == 0) {
           starHtml = span + span + span + span + span;
         }
         if (num == 0.5) {
           starHtml = zbSpan + span + span + span + span;
         }
-        if (num == 1.0) {
+        if (num > 0.5 && num <= 1.0) {
           starHtml = zSpan + span + span + span + span;
         }
         if (num == 1.5) {
           starHtml = zSpan + zbSpan + span + span + span;
         }
-        if (num == 2.0) {
+        if (num > 1.5 && num <= 2.0) {
           starHtml = zSpan + zSpan + span + span + span;
         }
         if (num == 2.5) {
           starHtml = zSpan + zSpan + zbSpan + span + span;
         }
-        if (num == 3.0) {
+        if (num > 2.5 && num <= 3.0) {
           starHtml = zSpan + zSpan + zSpan + span + span;
         }
         if (num == 3.5) {
           starHtml = zSpan + zSpan + zbSpan + span + span;
         }
-        if (num == 4.0) {
+        if (num > 3.5 && num <= 4.0) {
           starHtml = zSpan + zSpan + zSpan + zSpan + span;
         }
         if (num == 4.5) {
           starHtml = zSpan + zSpan + zSpan + zSpan + zbSpan;
         }
-        if (num == 5.0) {
+        if (num > 4.5 && num <= 5.0) {
           starHtml = zSpan + zSpan + zSpan + zSpan + zSpan;
         }
 

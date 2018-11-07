@@ -6,6 +6,7 @@ import router from './router'
 import ElementUI from 'element-ui';
 import '@/styles/global.scss'
 import 'element-ui/lib/theme-chalk/index.css';
+import 'nprogress/nprogress.css'
 import axios from 'axios'
 import global_ from './components/Global'
 

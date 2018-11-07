@@ -30,13 +30,16 @@
       this.initData(function () {
         that.load();
       });
+
     },
     methods: {
       load(){
         this.init();
-        this.addNodeTemplate(this.User);
+        console.log("endTime3",new Date().getMilliseconds())
+        //this.addNodeTemplate(this.User);
         this.addNodeTemplate(this.Supplier);
         this.layout();
+        console.log("endTime4",new Date().getMilliseconds())
       },
       layout() {
         this.myDiagram.model = go.Model.fromJson(this.myjson);
@@ -153,10 +156,13 @@
         var token = sessionStorage.getItem('token');
         smartSearchEdge(this.record.code, token).then(resp => {
           this.changeNodes(resp.data.nodes, resp.data.edges);
+          console.log("endTime2",new Date().getMilliseconds())
           callback();
         })
       },
       changeNodes(nodes, edges){
+        var startTime=new Date().getMilliseconds();
+        console.log("startTime",startTime)
         for (var i = 0; i < nodes.length; i++) {
           var node = {"key": nodes[i], "category": "Supplier", "text": nodes[i]};
           this.myjson.nodeDataArray.push(node);
@@ -167,6 +173,9 @@
           var link = {"from": edge.node_in, "to": edge.node_out};
           this.myjson.linkDataArray.push(link);
         }
+        var endTime=new Date().getMilliseconds();
+        console.log("endTime",endTime)
+        console.log("cha",endTime-startTime);
       },
       reloadProcess(){
         this.myjson.nodeDataArray = [];
