@@ -1,0 +1,116 @@
+@charset "utf-8";
+/* CSS Document */
+a {
+  text-decoration: none;
+}
+
+.home {
+  margin: 0 auto;
+}
+
+.left {
+
+  width: 186px;
+  background-color: #094C8E;
+  color: #ffffff;
+  font-size: 16px;
+  padding-top: 79px;
+  float: left;
+}
+
+.type {
+  background-color: #094177;
+  width: 120px;
+  margin-left: 30px;
+}
+
+.document {
+  width: 70px;
+  height: 25px;
+  padding: 6px 25px 5px 25px;
+}
+
+.list {
+  width: 186px;
+  height: 43px;
+  margin-top: 20px;
+}
+
+.list li {
+  list-style: none;
+  width: 60px;
+  height: 22px;
+  margin: 50px;
+  cursor: pointer;
+}
+
+.list li:hover {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 186px;
+  height: 48px;
+  background-color: #01386E;
+  font-weight: bold;
+  padding-top: 20px;
+}
+
+.right {
+  margin: 0;
+  padding: 0;
+  float: left;
+  width: 1014px;
+}
+
+.h {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000000;
+  text-align: center;
+  width: 120px;
+  height: 25px;
+  margin: 60px auto;
+
+}
+
+.table {
+  margin: 0;
+  padding: 0;
+  margin: 50px;
+  width: 885px;
+}
+
+.table thead {
+  padding: 60px;
+  background-color: #F2F8FF;
+}
+
+.table th {
+  width: 250px;
+  padding: 20px;
+  border-bottom: dashed;
+  border-color: #666;
+}
+
+.bot {
+  background-color: #999;
+}
+
+.bot ul {
+  list-style: none;
+}
+
+.bot ul li {
+  width: 100px;
+  float: left;
+  padding-right: 40px;
+}
+
+.download {
+  font-size: 16px;
+  font-family: '微软雅黑';
+  width: 100px;
+  float: right;
+  line-height: 30px;
+  cursor: pointer;
+}

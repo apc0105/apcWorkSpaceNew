@@ -14,18 +14,19 @@
   import {smartSearchEdge} from '@/api/homePage'
   import go from 'gojs';
   import datam from './data';
+
   var $ = go.GraphObject.make;
 
-  export default{
+  export default {
     props: ["record"],
     mixins: [datam],
-    data(){
+    data() {
       return {
         myDiagram: null,
         show: true
       }
     },
-    mounted(){
+    mounted() {
       var that = this;
       this.initData(function () {
         that.load();
@@ -33,20 +34,20 @@
 
     },
     methods: {
-      load(){
+      load() {
         this.init();
-        console.log("endTime3",new Date().getMilliseconds())
+        console.log("endTime3", new Date().getMilliseconds())
         //this.addNodeTemplate(this.User);
         this.addNodeTemplate(this.Supplier);
         this.layout();
-        console.log("endTime4",new Date().getMilliseconds())
+        console.log("endTime4", new Date().getMilliseconds())
       },
       layout() {
         this.myDiagram.model = go.Model.fromJson(this.myjson);
         this.myDiagram.layoutDiagram(true);
       },
 
-      getOption(){
+      getOption() {
         // for conciseness in defining templates
 
         let options = {
@@ -62,7 +63,7 @@
         return options;
       },
 
-      textStyle(){
+      textStyle() {
         return {
           margin: 10,
           wrap: go.TextBlock.WrapFit,
@@ -71,7 +72,7 @@
           font: this.getOption()['bigfont']
         }
       },
-      init(){
+      init() {
         this.myDiagram =
           $(go.Diagram, "myDiagramDiv",
             {
@@ -92,7 +93,7 @@
             // define the node's outer shape, which will surround the TextBlock
             $(go.Shape, "Ellipse",
               {
-                fill: this.getOption()['yellowgrad'], stroke: "black",
+                fill: this.getOption()['greengrad'], stroke: "black",
                 portId: "", fromLinkable: true, toLinkable: true, cursor: "pointer",
                 toEndSegmentLength: 50, fromEndSegmentLength: 40
               }),
@@ -107,12 +108,24 @@
         this.myDiagram.linkTemplate =
           $(go.Link,  // the whole link panel
             new go.Binding("points").makeTwoWay(),
-            {curve: go.Link.Bezier, toShortLength: 15},
+            {curve: go.Link.Bezier, toShortLength: 4},
             new go.Binding("curviness", "curviness"),
-            $(go.Shape,  // the link shape
-              {stroke: "#2F4F4F", strokeWidth: 2.5}),
-            $(go.Shape,  // the arrowhead
-              {toArrow: "kite", fill: "#2F4F4F", stroke: null, scale: 2})
+          $(go.Shape,  // the link shape
+              {stroke: "#2F4F4F", strokeWidth: 2}),
+               $(go.Shape,  // the arrowhead
+                {toArrow: "kite", fill: "#2F4F4F", stroke: null, scale: 2}),
+            $(go.TextBlock,  // the label text
+              {
+                textAlign: "center",
+                font: "10pt helvetica, arial, sans-serif",
+                stroke: "#919191",
+                margin: 4,
+                height: 40,
+                minSize: new go.Size(10, NaN),
+                editable: true  // enable in-place editing
+              },
+              // editing the text automatically updates the model data
+              new go.Binding("text").makeTwoWay())
           );
       },
       /**
@@ -141,7 +154,7 @@
        *
        * }
        */
-      addNodeTemplate(options){
+      addNodeTemplate(options) {
         let fill = this.getOption()[options.shapeOptions.fill];
         options.shapeOptions.fill = fill;
         this.myDiagram.nodeTemplateMap.add(options.category,
@@ -151,39 +164,26 @@
             $(go.TextBlock, this.textStyle(), new go.Binding("text", "text").makeTwoWay())
           ));
       },
-      initData(callback){
+      initData(callback) {
         var that = this;
         var token = sessionStorage.getItem('token');
         smartSearchEdge(this.record.code, token).then(resp => {
-          this.changeNodes(resp.data.nodes, resp.data.edges);
-          console.log("endTime2",new Date().getMilliseconds())
+          let respObj = resp.data;
+          if (respObj.code != 1) {
+            alert("未查询到数据！");
+            return;
+          }
+          this.myjson.nodeDataArray = respObj.data.nodes;
+          this.myjson.linkDataArray = respObj.data.edges
           callback();
         })
       },
-      changeNodes(nodes, edges){
-        var startTime=new Date().getMilliseconds();
-        console.log("startTime",startTime)
-        for (var i = 0; i < nodes.length; i++) {
-          var node = {"key": nodes[i], "category": "Supplier", "text": nodes[i]};
-          this.myjson.nodeDataArray.push(node);
-        }
-
-        for (var i = 0; i < edges.length; i++) {
-          var edge = edges[i];
-          var link = {"from": edge.node_in, "to": edge.node_out};
-          this.myjson.linkDataArray.push(link);
-        }
-        var endTime=new Date().getMilliseconds();
-        console.log("endTime",endTime)
-        console.log("cha",endTime-startTime);
-      },
-      reloadProcess(){
+      reloadProcess() {
         this.myjson.nodeDataArray = [];
         this.myjson.linkDataArray = [];
       }
 
     }
-
 
   }
 

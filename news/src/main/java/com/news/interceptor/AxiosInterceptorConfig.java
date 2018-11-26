@@ -25,7 +25,7 @@ public class AxiosInterceptorConfig extends WebMvcConfigurationSupport {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-        registry.addResourceHandler("/resources/**").addResourceLocations("file:" + env.getProperty("filepath.readpath"),"classpath:/static/");
+        registry.addResourceHandler(env.getProperty("filePath.relativePath")).addResourceLocations("file:" + env.getProperty("filePath.uploadPath"),"classpath:/static/");
 
         super.addResourceHandlers(registry);
     }

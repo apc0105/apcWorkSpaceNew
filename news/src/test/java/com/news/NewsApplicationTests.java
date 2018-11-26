@@ -2,6 +2,7 @@ package com.news;
 
 import com.news.model.ApiInfo;
 import com.news.service.ApiInfoService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,22 +13,23 @@ import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Ignore
 public class NewsApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		getAllByParams();
+		addInfo();
 	}
 
 	private void addInfo(){
 		ApiInfo apiInfo=new ApiInfo();
 		apiInfo.setPackageType("Java");
-		apiInfo.setPackageName("java1.jar");
-		apiInfo.setPackageRelativeAddress("/api/package/3_2.jar");
+		apiInfo.setPackageName("java1测试.jar");
+		apiInfo.setPackageRelativeAddress("/api/package/3_测试.jar");
 		apiInfo.setPackageVersion("1.0");
-		apiInfo.setDocName("接口3开发文档");
-		apiInfo.setDocRelativeAddress("/api/doc/3_2.doc");
-		apiInfo.setDependencyPackage(false);
+		apiInfo.setDocName("");
+		apiInfo.setDocRelativeAddress("");
+		apiInfo.setDependencyPackage(true);
 
 		apiInfoService.saveApiInfo(apiInfo);
 	}

@@ -10,6 +10,10 @@ import 'nprogress/nprogress.css'
 import axios from 'axios'
 import global_ from './components/Global'
 
+//解决Ie8以上兼容问题
+import 'babel-polyfill'
+import 'es6-promise/auto'
+
 import {forwardWindowByAction, getSingleUrlParam,windowHrefByAction} from '@/utils/RequestLocationUrl'
 
 Vue.config.productionTip = false

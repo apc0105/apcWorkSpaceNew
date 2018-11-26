@@ -1,6 +1,7 @@
 package com.news.model;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class NewsInfo implements Serializable {
 
@@ -33,4 +34,5 @@ public class NewsInfo implements Serializable {
     public void setScore(double score) {
         this.score = score;
     }
+
 }

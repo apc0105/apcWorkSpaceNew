@@ -1,15 +1,15 @@
 <template>
   <div class="main" :style="{height:height+'px'}" v-myOn:click="fn">
-    <div><span class="aboutLink" @click="openApi()">相关链接</span></div>
+    <div><span class="aboutLink" @click="openApi">资源下载</span></div>
     <div ref="s_search" class="s_search">
-      <div class="logotit"><img src="../../assets/images/img_wenzi.png"/><span style="font-size: 40px">（二版）</span></div>
+      <div class="logotit"><img src="../../../assets/images/img_wenzi.png"/><span class="newWord">（量化）</span></div>
       <div class=" srcon clearfix" style="">
         <div ref="serinp" id="serinp" class="searchl" @click="handleshow($event)">
           <el-input v-model="shiftName" @focus="handleinput($event)"
                     @input.native="handleinput($event),search(1)" @keyup.enter.native="enter($event)">
             <el-select v-model="nDirectionSelect" slot="prepend" placeholder="请选择"
                        style="width: 80px;background-color: #435a6c;">
-              <el-option label="上游" value="0"></el-option>
+<!--              <el-option label="上游" value="0"></el-option>-->
               <el-option label="下游" value="1"></el-option>
             </el-select>
           </el-input>
@@ -27,7 +27,7 @@
                   </div>-->
           </div>
         </div>
-        <div class="searchButton" @click="search(0)">
+        <div class="searchButton" @click="openForm">
           泰宝一下
         </div>
       </div>
@@ -62,6 +62,15 @@
       <process-go v-bind:record="record" ref="processGoPage"></process-go>
     </el-dialog>
 
+    <el-dialog title="提示" :visible.sync="dialogFormVisible">
+      <span>这是一段信息</span>
+      <el-input v-model="number"></el-input>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="search(0)">确 定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 
 </template>
@@ -83,6 +92,7 @@
         historicalRecordsList: ["原油", "黄金勘察", "铁矿石"],
         historicalRecordsListSize: 20,
         dialogTableVisible: false,
+        dialogFormVisible: false,
         searchResultVisible: false,
         smartSearchList: [],
         totalPageNumber: 1,
@@ -93,8 +103,9 @@
           name: '',
           code: ''
         },
-        nDirectionSelect: '0',
-        height: ''
+        nDirectionSelect: '1',
+        height: '',
+        number: ''
       }
     },
     directives: {
@@ -102,7 +113,6 @@
         bind(el, binding, vnode) {
           const event = binding.arg;
           const fn = binding.value;
-          console.log(el);
           el.addEventListener(event, fn);
         }
       }
@@ -119,6 +129,9 @@
         } else {
           si.className = "searchl focus"
         }
+      },
+      openForm(){
+        this.dialogFormVisible = true;
       },
       search(isFoc) {
         var that = this;
@@ -146,7 +159,7 @@
           this.$refs.serres.className = "home_width clearfix s_ani_sh0";
           this.totalNum = 0;
         }
-
+        this.dialogFormVisible = false;
       },
       handleinput(e) {
         var that = this;
@@ -324,7 +337,7 @@
         this.openPage(num);
       },
       openApi() {
-        this.$router.push('/api');
+        this.$router.push('/newsApi');
       }
     }
   }

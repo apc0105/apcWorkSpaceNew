@@ -1,8 +1,8 @@
 <template>
   <div class="main" :style="{height:height+'px'}" v-myOn:click="fn">
-    <div><span class="aboutLink" @click="openApi()">相关链接</span></div>
+    <div><span class="aboutLink" @click="openApi()">资源下载</span></div>
     <div ref="s_search" class="s_search">
-      <div class="logotit"><img src="../../assets/images/img_wenzi.png"/><span style="font-size: 40px">（二版）</span></div>
+      <div class="logotit"><img src="../../../assets/images/img_wenzi.png"/></div>
       <div class=" srcon clearfix" style="">
         <div ref="serinp" id="serinp" class="searchl" @click="handleshow($event)">
           <el-input v-model="shiftName" @focus="handleinput($event)"

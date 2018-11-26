@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2018/11/9.
  */
-@Service
+@Service("apiInfoService")
 public class ApiInfoServiceImpl implements ApiInfoService {
 
     @Autowired
