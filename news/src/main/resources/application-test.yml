@@ -4,14 +4,14 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/news
-      username: mongodb
-      password:
+      uri: mongodb://10.130.213.163:27017/TKFINANCE
+      username: mongo1
+      password: 123456
   redis:
     # Redis数据库索引（默认为0）
     database: 0
     # Redis服务器地址
-    host: 127.0.0.1
+    host: 10.130.217.180
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
@@ -29,5 +29,7 @@ spring:
         # 连接超时时间（毫秒）
         timeout: 1000
 filePath:
-  relativePath: /api/**/**
-  uploadPath: D:/
+  relativePath: /news/api/**
+  uploadPath: /usrlocal/taibao/
+##客户端接口地址
+clientUrl: http://10.130.213.159:8080/axis2/services/TKNewsService

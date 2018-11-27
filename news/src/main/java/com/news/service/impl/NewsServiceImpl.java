@@ -12,13 +12,16 @@ import com.news.support.Response;
 import com.news.util.RedisUtil;
 import com.tk.ws.TKNewsServiceClient;
 import com.tk.ws.TKNewsServiceInferenceExceptionException;
-import io.lettuce.core.ReadFrom;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service("newsService")
 public class NewsServiceImpl implements NewsService {
@@ -58,12 +61,14 @@ public class NewsServiceImpl implements NewsService {
     private InferenceResult[] getInferenceResults(int nDirection, String token, String search_value) {
         InferenceResult[] results = null;
 
+        String clientUrl = env.getProperty("clientUrl");
+
         if (redisUtil.hasKey(token)) {
             results = (InferenceResult[]) redisUtil.get(token);
         } else {
             try {
-                TKNewsServiceClient client = new TKNewsServiceClient();
-                results = client.getRelatedCompaniesByKey(search_value, 0, 0, 0, nDirection);//UP
+                TKNewsServiceClient client = new TKNewsServiceClient(clientUrl);
+                results = client.getRelatedCompaniesByKey(search_value, 0, 0, 0, nDirection,0);//UP
                 redisUtil.set(token, results, 1800);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -118,4 +123,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private Environment env;
 }

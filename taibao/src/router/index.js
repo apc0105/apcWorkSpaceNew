@@ -5,8 +5,8 @@ import NotFoundComponent from '@/view/error/notFoundCompoment'
 import processGo from '@/components/process-go'
 import homePage from '@/view/page/news1/homePage'
 import api from '@/view/page/news1/api'
-import news from '@/view/page/news2/homePage'
-import newsApi from '@/view/page/news2/api'
+import quant from '@/view/page/news2/homePage'
+import quantApi from '@/view/page/news2/api'
 
 Vue.use(Router)
 
@@ -30,14 +30,14 @@ const router=new Router({
       component: api
     },
     {
-      path: '/news',
-      name: 'news',
-      component: news
+      path: '/quant',
+      name: 'quant',
+      component: quant
     },
     {
-      path: '/newsApi',
-      name: 'newsApi',
-      component: newsApi
+      path: '/quantApi',
+      name: 'quantApi',
+      component: quantApi
     },
     {
       path: '*',

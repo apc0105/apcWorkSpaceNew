@@ -62,9 +62,9 @@
       <process-go v-bind:record="record" ref="processGoPage"></process-go>
     </el-dialog>
 
-    <el-dialog title="提示" :visible.sync="dialogFormVisible">
-      <span>这是一段信息</span>
-      <el-input v-model="number"></el-input>
+    <el-dialog title="" :visible.sync="dialogFormVisible" align="center">
+      <span style="font-size:18px;font-weight: bold;">原料价格变动比例(%):</span>
+      <el-input v-model="number" style="width: 200px;" type="number" :step="0.01"></el-input>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="search(0)">确 定</el-button>
@@ -337,7 +337,7 @@
         this.openPage(num);
       },
       openApi() {
-        this.$router.push('/newsApi');
+        this.$router.push('/quantApi');
       }
     }
   }

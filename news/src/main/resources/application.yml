@@ -1,5 +1,7 @@
-
+server:
+  servlet:
+    context-path: /news
 
 spring:
   profiles:
-    active: dev
+    active: test

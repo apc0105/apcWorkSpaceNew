@@ -29,5 +29,8 @@ spring:
         # 连接超时时间（毫秒）
         timeout: 1000
 filePath:
-  relativePath: /api/**
-  uploadPath: D:/
+  relativePath: /news/api/**
+  uploadPath: D:/taibao/
+##客户端接口地址
+clientUrl: http://localhost:8080/axis2/services/TKSearchService
+
