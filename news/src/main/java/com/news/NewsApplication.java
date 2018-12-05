@@ -7,7 +7,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.web.WebApplicationInitializer;
 
-@SpringBootApplication(scanBasePackages = { "com.news","ai.hual.sentiment","com.tk.ws"})
+@SpringBootApplication(scanBasePackages = { "com.news","ai.hual.sentiment","com.tk.ws","com.tk.quantization"})
 @EnableCaching
 public class NewsApplication extends SpringBootServletInitializer implements WebApplicationInitializer {
 

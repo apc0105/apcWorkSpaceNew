@@ -10,6 +10,8 @@ import com.news.model.WebNode;
 import com.news.service.NewsService;
 import com.news.support.Response;
 import com.news.util.RedisUtil;
+import com.tk.quantization.TKQuantizationServiceClient;
+import com.tk.quantization.TKQuantizationServiceInferenceExceptionException;
 import com.tk.ws.TKNewsServiceClient;
 import com.tk.ws.TKNewsServiceInferenceExceptionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +20,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service("newsService")
 public class NewsServiceImpl implements NewsService {
 
     @Override
-    public Response findNews(int nDirection, String token, String search_value, int pageNumber) {
+    public Response findNews(int nDirection, String token, String search_value, int pageNumber,float flPriceChng) {
 
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
-        InferenceResult[] results = getInferenceResults(nDirection, token, search_value);
+        InferenceResult[] results = getInferenceResults(nDirection, token, search_value, flPriceChng);
         if (results == null) {
             return Response.fail();
         }
@@ -58,21 +57,33 @@ public class NewsServiceImpl implements NewsService {
         return Response.ok(resultMap);
     }
 
-    private InferenceResult[] getInferenceResults(int nDirection, String token, String search_value) {
+    private InferenceResult[] getInferenceResults(int nDirection, String token, String search_value,float flPriceChng) {
         InferenceResult[] results = null;
 
         String clientUrl = env.getProperty("clientUrl");
+        int nMaxNum = Integer.parseInt(env.getProperty("nMaxNum"));
+        int nMaxDepth = Integer.parseInt(env.getProperty("nMaxDepth"));
+        int nOrderType = Integer.parseInt(env.getProperty("nOrderType"));
+        int flWeightThreshold = Integer.parseInt(env.getProperty("flWeightThreshold"));
 
         if (redisUtil.hasKey(token)) {
             results = (InferenceResult[]) redisUtil.get(token);
         } else {
             try {
-                TKNewsServiceClient client = new TKNewsServiceClient(clientUrl);
-                results = client.getRelatedCompaniesByKey(search_value, 0, 0, 0, nDirection,0);//UP
+                if(ObjectUtils.isEmpty(flPriceChng)||flPriceChng==0){
+                    TKNewsServiceClient client = new TKNewsServiceClient(clientUrl);
+                    results = client.getRelatedCompaniesByKey(search_value, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
+                }else{
+                    TKQuantizationServiceClient quantizationServiceClient=new TKQuantizationServiceClient(clientUrl);
+                    results = quantizationServiceClient.getRelatedCompaniesByKey(search_value,flPriceChng,nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
+                }
+
                 redisUtil.set(token, results, 1800);
             } catch (RemoteException e) {
                 e.printStackTrace();
             } catch (TKNewsServiceInferenceExceptionException e) {
+                e.printStackTrace();
+            } catch (TKQuantizationServiceInferenceExceptionException e) {
                 e.printStackTrace();
             }
         }
@@ -90,7 +101,7 @@ public class NewsServiceImpl implements NewsService {
 
         InferenceResult[] results = (InferenceResult[]) redisUtil.get(token);
 
-        if(ObjectUtils.isEmpty(results)){
+        if (ObjectUtils.isEmpty(results)) {
             return Response.fail();
         }
 
@@ -98,13 +109,28 @@ public class NewsServiceImpl implements NewsService {
             if (results[i].getCode().equals(code)) {
                 for (Route route : results[i].getRoutes()) {
                     for (Node node : route.getNodes()) {
-                        WebNode webNode=new WebNode();
+
+                        WebNode webNode = new WebNode();
                         webNode.setKey(node.getName());
                         webNode.setText(node.getName());
-                        nodes.add(webNode);
+
+                        boolean flag=false;
+
+                        if(!ObjectUtils.isEmpty(nodes)&&nodes.size()>0){
+                            for(WebNode node1:nodes){
+                                if(node1.getKey().equals(webNode.getKey())){
+                                    flag=true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(!flag){
+                            nodes.add(webNode);
+                        }
                     }
                     for (Edge edge : route.getEdges()) {
-                        NodeEdge nodeEdge=new NodeEdge();
+                        NodeEdge nodeEdge = new NodeEdge();
                         nodeEdge.setFrom(edge.getSource());
                         nodeEdge.setTo(edge.getTarget());
                         nodeEdge.setText(edge.getRelation());
@@ -119,7 +145,6 @@ public class NewsServiceImpl implements NewsService {
 
         return Response.ok(resultMap);
     }
-
 
     @Autowired
     private RedisUtil redisUtil;

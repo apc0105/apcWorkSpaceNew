@@ -21,11 +21,16 @@
   border: 1px solid #FFFFFF;
   font-size: 14px;
   color: #FFFFFF;
-  float: right;
+ /* float: right;*/
   margin: 35px 80px;
   padding: 6px;
   cursor: pointer;
   opacity: 0.6;
+  letter-spacing:3px;
+  text-indent:5px;
+  position: absolute;
+  right: 0px;
+  z-index: 9;
 }
 
 .home_width {
@@ -163,9 +168,10 @@
 
 .scommcon .pagebox {
   margin-top: 10px;
-  padding: 10px 40px;
+  padding: 8px 40px;
   text-align: right;
   background-color: #f8f8f8;
+  height: 40px;
 }
 
 .scommcon .pagebox a {
@@ -177,7 +183,7 @@
   color: #9d9d9d;
 }
 
-.scommcon .pagebox a.active {
+.scommcon .pagebox .active {
   color: #fff;
   background-color: #00aeb1;
 }
@@ -186,7 +192,7 @@
   color: #020202;
 }
 
-.scommcon .pagebox a:hover {
+.scommcon .pagebox li:hover {
   color: #fff;
   background-color: #00aeb1;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="home" :style="{width:homeWidth+'px'}">
+  <div class="home"><!--:style="{width:homeWidth+'px'}"-->
     <div class="left" :style="{height:height+'px'}">
       <div class="type">
         <div class="document">
@@ -20,27 +20,29 @@
         <table>
           <thead>
           <tr>
-            <th>包名</th>
-            <th>包地址</th>
+            <th>包</th>
+            <th>版本号</th>
             <th>API地址</th>
           </tr>
           </thead>
-          <tr v-for="item in mainPackages">
-            <th>{{item.packageName}}</th>
-            <th><a :href="baseUrl+item.packageRelativeAddress">{{baseUrl+item.packageRelativeAddress}}</a></th>
-            <th><a :href="baseUrl+item.docRelativeAddress">{{item.docName}}</a></th>
+          <tr v-for="item in mainPackages" >
+            <th class="thbb"><a :href="baseUrl+item.packageRelativeAddress" class="fc">{{item.packageName}}</a></th>
+            <th class="thbb">{{item.packageVersion}}</th>
+            <th class="thbb"><a :href="baseUrl+item.docRelativeAddress" class="fc">{{item.docName}}</a></th>
           </tr>
           <tr v-if="dependencyPackages.length >0">
             <th colspan="3" class="bot">
               <ul>
                 <li>依赖包</li>
-                <li v-for="item in dependencyPackages"><a :href="baseUrl+item.packageRelativeAddress">{{item.packageName}}</a>
+                <li v-for="item in dependencyPackages"><a :href="baseUrl+item.packageRelativeAddress" class="fc">{{item.packageName}}</a>
                 </li>
               </ul>
             </th>
           </tr>
         </table>
-        <div><input class="download" type="button" value="批量下载" @click="handleBatchDownload"/></div>
+        <div style="margin-top: 20px;">
+          <el-button class="download" @click="handleBatchDownload" style="background: #042E58;font-size: 14px;color: #FFFFFF;"><i class="el-icon-download"></i>&nbsp;批量下载</el-button>
+        </div>
       </div>
     </div>
   </div>
@@ -63,7 +65,9 @@
 
         method: 'get',
 
-        url
+        url,
+
+        responseType: 'arraybuffer'
 
       }).then(data => {
 

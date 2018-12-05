@@ -6,11 +6,14 @@ a {
 
 .home {
   margin: 0 auto;
+  background-color: #F9F9F9;
+  width: 100%;
 }
 
 .left {
-
-  width: 186px;
+  background: url("../assets/images/leftmenu.png") no-repeat;
+  background-size: cover;
+  width: 10%;
   background-color: #094C8E;
   color: #ffffff;
   font-size: 16px;
@@ -19,65 +22,61 @@ a {
 }
 
 .type {
-  background-color: #094177;
-  width: 120px;
-  margin-left: 30px;
+  background: rgba(0, 0, 0, .3);
+  width: 80%;
+  height: 36px;
+  margin-left: 10%;
 }
 
 .document {
-  width: 70px;
-  height: 25px;
-  padding: 6px 25px 5px 25px;
+  text-align: center;
+  line-height: 36px;
+  font-size: 16px;
+  color: #FFFFFF;
 }
 
 .list {
-  width: 186px;
-  height: 43px;
+  width: 100%;
   margin-top: 20px;
 }
 
 .list li {
+  text-align: center;
   list-style: none;
-  width: 60px;
-  height: 22px;
-  margin: 50px;
+  line-height: 80px;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .list li:hover {
-  margin: 0;
-  padding: 0;
   text-align: center;
-  width: 186px;
-  height: 48px;
+  width: 100%;
   background-color: #01386E;
   font-weight: bold;
-  padding-top: 20px;
+
+  color: #10F5F5;
 }
 
 .right {
-  margin: 0;
-  padding: 0;
   float: left;
-  width: 1014px;
+  width: 90%;
 }
 
 .h {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: bold;
   color: #000000;
-  text-align: center;
-  width: 120px;
   height: 25px;
-  margin: 60px auto;
+  margin: 60px;
 
 }
 
 .table {
-  margin: 0;
-  padding: 0;
   margin: 50px;
-  width: 885px;
+}
+
+.table table {
+  width: 95%;
 }
 
 .table thead {
@@ -86,14 +85,21 @@ a {
 }
 
 .table th {
-  width: 250px;
+  width: 324px;
   padding: 20px;
-  border-bottom: dashed;
-  border-color: #666;
+  font-size: 16px;
+  font-weight: normal;
+  color: #2C2C2C;
+}
+
+.thbb {
+  border-bottom: 1px dashed #979797;;
 }
 
 .bot {
-  background-color: #999;
+  background-color: #F8F8F8;
+  overflow: auto;
+  margin: 0 auto;
 }
 
 .bot ul {
@@ -103,14 +109,25 @@ a {
 .bot ul li {
   width: 100px;
   float: left;
-  padding-right: 40px;
+  padding-right: 10px;
 }
 
 .download {
-  font-size: 16px;
   font-family: '微软雅黑';
-  width: 100px;
+  width: 120px;
+  height: 40px;
   float: right;
   line-height: 30px;
-  cursor: pointer;
+  /*  font-size: 14px;
+    color: #FFFFFF;*/
+  background: #042E58;
+}
+
+.fc {
+  color: #2878FC;
+}
+
+.el-button {
+  margin-top: 20px !important;
+  margin-right: 5% !important;
 }

@@ -1,7 +1,10 @@
 package com.news;
 
 import com.news.model.ApiInfo;
+import com.news.model.SearchHintKeys;
+import com.news.model.WebNode;
 import com.news.service.ApiInfoService;
+import com.news.service.SearchHintKeysService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -16,9 +20,14 @@ import java.util.List;
 @Ignore
 public class NewsApplicationTests {
 
-	@Test
-	public void contextLoads() {
-		addInfo();
+
+	private void addSearchHintKeys(){
+		SearchHintKeys keys=new SearchHintKeys();
+//		keys.setName("石油");
+// 		keys.setName("石脑油");
+		keys.setName("对二甲苯");
+
+		searchHintKeysService.saveSearchHintKeys(keys);
 	}
 
 	private void addInfo(){
@@ -63,6 +72,48 @@ public class NewsApplicationTests {
 		}
 	}
 
+
+	private void testList(){
+		List<WebNode> nodes = new ArrayList<WebNode>();
+
+		for(int i=0;i<10;i++){
+			WebNode webNode = new WebNode();
+			webNode.setKey("test"+i);
+			webNode.setText("test"+i);
+			nodes.add(webNode);
+		}
+		for(int j=0;j<10;j++){
+			WebNode webNode = new WebNode();
+			webNode.setKey("test"+j);
+			webNode.setText("test"+j);
+			boolean flag=false;
+			for(WebNode node:nodes){
+				if(node.getKey().equals(webNode.getKey())){
+					flag=true;
+					break;
+				}
+			}
+			if(!flag){
+				nodes.add(webNode);
+			}
+		}
+
+
+		for(WebNode webNode:nodes){
+			System.out.println("------"+webNode.getKey()+"------"+webNode.getText()+"------");
+		}
+	}
+
+	@Test
+	public void contextLoads() {
+
+		//testList();
+
+		addSearchHintKeys();
+	}
 	@Autowired
 	private ApiInfoService apiInfoService;
+
+	@Autowired
+	private SearchHintKeysService searchHintKeysService;
 }

@@ -4,9 +4,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://10.130.213.163:27017/TKFINANCE
-      username: mongo1
-      password: 123456
+      uri: mongodb://mongo1:123456@10.130.213.163:27017/TKFINANCE?authMechanism=SCRAM-SHA-1
   redis:
     # Redis数据库索引（默认为0）
     database: 0
@@ -29,7 +27,12 @@ spring:
         # 连接超时时间（毫秒）
         timeout: 1000
 filePath:
-  relativePath: /news/api/**
-  uploadPath: /usrlocal/taibao/
+  relativePath: /api/**
+  uploadPath: /usr/local/taibao/
 ##客户端接口地址
 clientUrl: http://10.130.213.159:8080/axis2/services/TKNewsService
+##客户端数据配置
+nMaxNum: 300
+nMaxDepth: 10
+nOrderType: 0
+flWeightThreshold: 0

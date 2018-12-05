@@ -1,6 +1,6 @@
-server:
-  servlet:
-    context-path: /news
+#server:
+#  servlet:
+#    context-path: /news
 
 spring:
   profiles:

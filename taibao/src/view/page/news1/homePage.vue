@@ -5,20 +5,21 @@
       <div class="logotit"><img src="../../../assets/images/img_wenzi.png"/></div>
       <div class=" srcon clearfix" style="">
         <div ref="serinp" id="serinp" class="searchl" @click="handleshow($event)">
-          <el-input v-model="shiftName" @focus="handleinput($event)"
-                    @input.native="handleinput($event),search(1)" @keyup.enter.native="enter($event)">
+          <el-input v-model="shiftName" @focus="handleInput($event)"
+                    @input.native="handleInput($event),search(1)">
+            <!--@keyup.enter.native="enter($event)" <!--@input.native="handleinput($event),search(1)"-->-->
             <el-select v-model="nDirectionSelect" slot="prepend" placeholder="请选择"
                        style="width: 80px;background-color: #435a6c;">
-              <el-option label="上游" value="0"></el-option>
-              <el-option label="下游" value="1"></el-option>
+              <el-option label="上游" value="1"></el-option>
+              <el-option label="下游" value="0"></el-option>
             </el-select>
           </el-input>
           <!--<div class="sod"></div>-->
           <div class="sc" id="sermess" ref="sermess">
             <ul>
-              <li style="border-bottom:#ffffff solid 1px;" v-for="(item,index) in historicalRecordsList"
+              <li style="border-bottom:#ffffff solid 1px;" v-for="(item,index) in keyWordsList"
                   @click="inputMess($event)" :key="index">
-                {{ item }}
+                {{ item.name }}
               </li>
             </ul>
             <!--      <div class="cz">
@@ -47,9 +48,15 @@
           </dl>
 
           <div class="pagebox">
-            <a href="javascript:void(0);" v-for="(item,index) in totalPageNumber" :class="currentPage==item?'active':''"
-               @click="openPage(item)">{{item}}</a>
-            <a href="javascript:void(0);" class="next" @click="nextPage()">下一页</a>
+            <!--            <a href="javascript:void(0);" v-for="(item,index) in totalPageNumber" :class="currentPage==item?'active':''"
+                           @click="openPage(item)">{{item}}</a>
+                        <a href="javascript:void(0);" class="next" @click="nextPage()">下一页</a>-->
+            <el-pagination
+              background
+              @current-change="handleCurrentChange"
+              layout="prev, pager, next"
+              :page-count="totalPageNumber">
+            </el-pagination>
           </div>
         </div>
 
@@ -68,7 +75,7 @@
 
 <script>
   import '@/styles/homePage.css'
-  import {smartSearch, smartSearchPage, smartSearchEdge} from '@/api/homePage'
+  import {smartSearch, smartSearchPage, smartSearchEdge, searchHintKeys} from '@/api/homePage'
   import processGo from '@/components/process-go'
   import NProgress from 'nprogress'
 
@@ -80,7 +87,8 @@
     data() {
       return {
         shiftName: '',
-        historicalRecordsList: ["原油", "黄金勘察", "铁矿石"],
+        keyWordsList: [],
+        historicalRecordsList: [],
         historicalRecordsListSize: 20,
         dialogTableVisible: false,
         searchResultVisible: false,
@@ -93,7 +101,7 @@
           name: '',
           code: ''
         },
-        nDirectionSelect: '0',
+        nDirectionSelect: '1',
         height: ''
       }
     },
@@ -109,9 +117,32 @@
     },
     mounted() {
       this.height = window.screen.availHeight - 100;
+      this.initSearchKeys("");
     },
     methods: {
-      fn(){
+      initSearchKeys(keyWords) {
+        searchHintKeys(keyWords).then(resp => {
+          let respObj = resp.data;
+          if (respObj.code != 1) {
+            console.log("未查询到数据！");
+            return;
+          }
+          this.keyWordsList = respObj.data;
+
+          if (keyWords == "") {
+            this.keyWordsList = this.historicalRecordsList.concat(
+              this.keyWordsList
+            );
+          }
+
+          if(this.keyWordsList.length > 5){
+            this.$refs.sermess.style.height = "160px";
+            this.$refs.sermess.style.overflow = "auto";
+          }
+
+        })
+      },
+      fn() {
         document.getElementById('sermess').style.display = "none";
         var si = document.getElementById('serinp');
         if (si.firstElementChild.firstElementChild.value == "") {
@@ -119,6 +150,10 @@
         } else {
           si.className = "searchl focus"
         }
+      },
+      handleCurrentChange(val) {
+        this.currentPage = val;
+        this.openPage(val);
       },
       search(isFoc) {
         var that = this;
@@ -148,12 +183,14 @@
         }
 
       },
-      handleinput(e) {
+      handleInput(e) {
         var that = this;
         var el = e.target;
+
         if (el.innerText != "" && el.innerText != undefined) {
           that.$refs.sermess.style.display = 'none';
         } else {
+          that.initSearchKeys(el.value);
           that.$refs.sermess.style.display = 'block';
         }
 
@@ -171,12 +208,12 @@
         this.$refs.sermess.style.display = 'none';
         this.$refs.serinp.className = "searchl focus";
       },
-      enter(e) {
-        var el = e.target.value;
-        this.searchValue = el;
-        this.$refs.sermess.style.display = 'none';
-        this.search(0);
-      },
+      /*  enter(e) {
+          console.log("enter");
+          var el = e.target.value;
+          this.$refs.sermess.style.display = 'none';
+          this.search(0);
+        },*/
       handleshow(e) {
         e.stopPropagation();
         e.cancelBubble = true;
@@ -198,7 +235,8 @@
         this.dialogTableVisible = false;
       },
       initPage(searchValue, callback) {
-        smartSearch(this.nDirectionSelect, searchValue).then(resp => {
+        var that = this;
+        smartSearch(this.nDirectionSelect, searchValue, 0).then(resp => {
           let respObj = resp.data;
           if (respObj.code != 1) {
             NProgress.done();
@@ -208,20 +246,14 @@
           console.log("resp", resp)
           this.smartSearchList = respObj.data.nodes;
           this.totalPageNumber = respObj.data.total_page;
+
           this.currentPage = respObj.data.current_page;
 
           if (respObj.data.total_num != null) {
             this.totalNum = respObj.data.total_num;
             console.log("height", this.$refs.sermess);
-            if (this.historicalRecordsList.indexOf(searchValue) == -1) {
 
-              this.historicalRecordsList.splice(3, 0, searchValue);
-              this.$refs.sermess.style.height = "160px";
-              this.$refs.sermess.style.overflow = "auto";
-              if (this.historicalRecordsList.length > this.historicalRecordsListSize) {
-                this.historicalRecordsList.pop();
-              }
-            }
+            this.dealKeyWordsAndHistoricalRecord(searchValue);
 
           }
           this.token = respObj.data.token;
@@ -229,8 +261,44 @@
           callback();
         })
       },
-      numChangeStar(num) {
+      dealKeyWordsAndHistoricalRecord(searchValue){
+        let keyWordFlag = false;
+        let historyWordFlag = false;
 
+        if (this.keyWordsList != null && this.keyWordsList.length > 0) {
+          for (let i = 0; i < this.keyWordsList.length; i++) {
+            let keyWord = this.keyWordsList[i].name;
+            if (keyWord == searchValue) {
+              keyWordFlag = true;
+              break;
+            }
+          }
+        }
+
+        if (this.historicalRecordsList != null && this.historicalRecordsList.length > 0) {
+          for (let j = 0; j < this.historicalRecordsList.length; j++) {
+            let keyWord = this.historicalRecordsList[j].name;
+            if (keyWord == searchValue) {
+              historyWordFlag = true;
+              break;
+            }
+          }
+        }
+
+        if (!keyWordFlag && !historyWordFlag) {
+
+          let historicalRecord = {"name": searchValue};
+          //向历史记录中添加数据
+          this.historicalRecordsList.splice(0, 0, historicalRecord);
+          this.$refs.sermess.style.height = "160px";
+          this.$refs.sermess.style.overflow = "auto";
+          if (this.historicalRecordsList.length + this.keyWordsList.length > this.historicalRecordsListSize) {
+            this.historicalRecordsList.pop();
+          }
+        }
+      },
+      numChangeStar(num) {
+        num = num * 5;
         var starHtml = '';
         var span = '<span></span>';
         var zSpan = '<span class="z"></span>';
@@ -306,7 +374,7 @@
         return starHtml;
       },
       openPage(num) {
-        smartSearchPage(this.nDirectionSelect, num, this.token).then(resp => {
+        smartSearchPage(this.nDirectionSelect, num, this.token, 0).then(resp => {
           let respObj = resp.data;
           this.smartSearchList = respObj.data.nodes;
           this.totalPageNumber = respObj.data.total_page;
