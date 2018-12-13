@@ -140,6 +140,10 @@
             this.$refs.sermess.style.overflow = "auto";
           }
 
+          if(this.keyWordsList.length == 0){
+            this.$refs.sermess.style.display = 'none';
+          }
+
         })
       },
       fn() {

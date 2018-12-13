@@ -61,6 +61,7 @@ public class NewsServiceImpl implements NewsService {
         InferenceResult[] results = null;
 
         String clientUrl = env.getProperty("clientUrl");
+        String quantClientUrl = env.getProperty("quantClientUrl");
         int nMaxNum = Integer.parseInt(env.getProperty("nMaxNum"));
         int nMaxDepth = Integer.parseInt(env.getProperty("nMaxDepth"));
         int nOrderType = Integer.parseInt(env.getProperty("nOrderType"));
@@ -73,9 +74,9 @@ public class NewsServiceImpl implements NewsService {
                 if(ObjectUtils.isEmpty(flPriceChng)||flPriceChng==0){
                     TKNewsServiceClient client = new TKNewsServiceClient(clientUrl);
                     results = client.getRelatedCompaniesByKey(search_value, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
-                }else{
-                    TKQuantizationServiceClient quantizationServiceClient=new TKQuantizationServiceClient(clientUrl);
-                    results = quantizationServiceClient.getRelatedCompaniesByKey(search_value,flPriceChng,nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
+                } else {
+                    TKQuantizationServiceClient quantizationServiceClient = new TKQuantizationServiceClient(quantClientUrl);
+                    results = quantizationServiceClient.getRelatedCompaniesByKey(search_value, flPriceChng, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
                 }
 
                 redisUtil.set(token, results, 1800);

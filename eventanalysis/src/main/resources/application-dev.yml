@@ -1,15 +1,9 @@
-server:
-  port: 8082
-
 spring:
-  data:
-    mongodb:
-      uri: mongodb://finance:pass1234@10.130.218.166:27017/TKfinance?authMechanism=SCRAM-SHA-1
   redis:
     # Redis数据库索引（默认为0）
     database: 0
     # Redis服务器地址
-    host: 10.130.218.167
+    host: 10.130.217.180
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
@@ -26,14 +20,10 @@ spring:
         min-idle: 0
         # 连接超时时间（毫秒）
         timeout: 1000
+
+clientUrl: http://127.0.0.1:5000/newsEvent?newspath=
+
 filePath:
-  relativePath: /api/**
-  uploadPath: /usr/local/taibao/
-##客户端接口地址
-clientUrl: http://10.130.218.175:8080/axis2/services/TKNewsService
-quantClientUrl: http://10.130.218.175:8080/axis2/services/TKQuantizationService
-##客户端数据配置
-nMaxNum: 300
-nMaxDepth: 10
-nOrderType: 0
-flWeightThreshold: 0
+    relativePath: /api/**
+    uploadPath: /usr/local/taibao/temp/
+

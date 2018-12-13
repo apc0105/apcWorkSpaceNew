@@ -71,7 +71,7 @@
 
     <el-dialog title="" :visible.sync="dialogFormVisible" align="center" width="416px" :style="{marginTop:'150px'}">
       <span style="font-size: 14px;color: #042E58;letter-spacing: 0;">原料价格变动比例(%)</span>
-      <el-input v-model="flPriceChng" style="width: 120px;height: 30px;" type="number" :step="0.01"></el-input>
+      <el-input v-model.number="flPriceChng" style="width: 120px;height: 30px;" type="number" :step="0.01"></el-input>
       <div slot="footer" class="dialog-footer" style="text-align: center;">
         <el-button @click="dialogFormVisible = false" style="width:80px;height:30px;border: 1px solid #042E58;font-size: 14px;color: #042E58;padding: 0;border-radius: 2px;">取 消</el-button>
         <el-button type="primary" @click="search(0)" style="width:80px;height:30px;border: 1px solid #042E58;background:#042E58;font-size: 14px;color: #FFFFFF;padding: 0;border-radius: 2px;">确 定</el-button>
@@ -113,7 +113,7 @@
         },
         nDirectionSelect: '0',
         height: '',
-        flPriceChng: 0
+        flPriceChng: ''
       }
     },
     directives: {
@@ -148,6 +148,9 @@
           if(this.keyWordsList.length > 5){
             this.$refs.sermess.style.height = "160px";
             this.$refs.sermess.style.overflow = "auto";
+          }
+          if(this.keyWordsList.length == 0){
+            this.$refs.sermess.style.display = 'none';
           }
         })
       },
@@ -306,7 +309,6 @@
         }
       },
       numChangeStar(num) {
-        num=num*5;
         var starHtml = '';
         var span = '<span></span>';
         var zSpan = '<span class="z"></span>';
