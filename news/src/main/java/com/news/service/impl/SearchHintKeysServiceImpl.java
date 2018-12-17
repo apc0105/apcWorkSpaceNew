@@ -13,8 +13,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service("searchHintKeysService")
 public class SearchHintKeysServiceImpl implements SearchHintKeysService {
@@ -53,11 +51,8 @@ public class SearchHintKeysServiceImpl implements SearchHintKeysService {
             return searchHintKeysList;
         }
 
-        Pattern pattern = Pattern.compile(keyWords);
-
         for (SearchHintKeys searchHintkey : searchHintKeysList) {
-            Matcher matcher = pattern.matcher(searchHintkey.getName());
-            if (matcher.find()) {
+            if (searchHintkey.getName().indexOf(keyWords) > -1) {
                 results.add(searchHintkey);
             }
         }
@@ -76,7 +71,7 @@ public class SearchHintKeysServiceImpl implements SearchHintKeysService {
 
 //        log.info("---before save to Redis ---Get list size----"+searchHintKeysList.size()+"-------");
 
-        if(searchHintKeysList.size()>0){
+        if (searchHintKeysList.size() > 0) {
 
             redisUtil.set("searchHintKeys", searchHintKeysList);
 

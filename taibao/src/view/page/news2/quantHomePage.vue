@@ -165,6 +165,7 @@
     },
     methods: {
       initSearchKeys(keyWords,callback) {
+        
         searchHintKeys(keyWords).then(resp => {
           let respObj = resp.data;
           if (respObj.code != 1) {
@@ -251,12 +252,10 @@
         if (el.innerText != "" && el.innerText != undefined) {
           that.$refs.sermess.style.display = 'none';
         } else {
-          if (/^[\u4e00-\u9fa5]/g.test(el.value)) {
             that.shiftName = el.value;
             that.initSearchKeys(el.value,function () {
               that.$refs.sermess.style.display = 'block';
             });
-          }
         }
 
       },

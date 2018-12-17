@@ -1,6 +1,10 @@
+import promise from 'es6-promise'
+promise.polyfill();
+
 import axios from 'axios'
 import {Message} from 'element-ui'
 import router from '@/router'
+
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
@@ -23,7 +27,7 @@ service.interceptors.request.use(config => {
 }, error => {
   // Do something with request error
   console.warn(error) // for debug
-  Promise.reject(error)
+  promise.reject(error)
 })
 
 // respone interceptor
@@ -42,7 +46,7 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       })
-      return Promise.reject('error')
+      return promise.reject('error')
     } else {
       return res
     }
@@ -59,7 +63,7 @@ service.interceptors.response.use(
     } else {
       Message.error('系统异常')
     }
-    return Promise.reject(error)
+    return promise.reject(error)
   })
 //增加重试机制
 // service.interceptors.response.use(undefined, function axiosRetryInterceptor(err) {
