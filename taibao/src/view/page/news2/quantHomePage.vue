@@ -5,13 +5,14 @@
       <div class="logotit"><img src="../../../assets/images/img_wenzi.png"/><span class="newWord">（量化）</span></div>
       <div class=" srcon clearfix" style="">
         <div ref="serinp" id="serinp" class="searchl" @click="handleshow($event)">
-          <el-input v-model="shiftName" @focus="handleinput($event)"
-                    @input.native="handleinput($event),search(1)" ><!--@keyup.enter.native="enter($event)"-->
-            <el-select v-model="nDirectionSelect" slot="prepend" placeholder="请选择"
-                       style="width: 80px;background-color: #435a6c;">
-<!--              <el-option label="上游" value="0"></el-option>-->
-              <el-option label="下游" value="0"></el-option>
-            </el-select>
+          <el-input v-model="shiftName" @focus="handleinput($event)" @input.native="handleinput($event),search(1)"
+                    ><!--@keyup.enter.native="enter($event)"
+                     onkeyup="this.value=this.value.replace(/[^\u4E00-\u9FA5]/g,'');"-->
+            <!-- <el-select v-model="nDirectionSelect" slot="prepend" placeholder="请选择"
+                        style="width: 80px;background-color: #435a6c;">
+ <             <el-option label="上游" value="0"></el-option>
+               <el-option label="下游" value="0"></el-option>
+             </el-select>-->
           </el-input>
           <!--<div class="sod"></div>-->
           <div class="sc" id="sermess" ref="sermess">
@@ -32,12 +33,12 @@
         </div>
       </div>
 
-      <div ref="serres" class="home_width clearfix" style="display: none;">
+      <div ref="serres" class="home_width1 clearfix" style="display: none;">
         <div class="scomm">泰宝为您找到受影响公司结果约 <em>{{totalNum}}</em> 个。<span class="z">正面影响力</span><span
           class="f">负面影响力</span></div>
-        <div class="scommcon">
+        <div class="scommcon1" style="border-right: 10px solid #f8f8f8;">
           <dl>
-            <dt class="tit">公司名称</dt>
+            <dt class="tit">股票名称</dt>
             <dd class="tit">影响程度及方向</dd>
           </dl>
 
@@ -46,20 +47,39 @@
             <dd v-html="numChangeStar(item.score)"></dd>
           </dl>
 
-          <div class="pagebox">
-  <!--          <a href="javascript:void(0);" v-for="(item,index) in totalPageNumber" :class="currentPage==item?'active':''"
-               @click="openPage(item)">{{item}}</a>
-            <a href="javascript:void(0);" class="next" @click="nextPage()">下一页</a>-->
+          <div class="pagebox" style="padding-left: 10px;">
 
             <el-pagination
               background
               @current-change="handleCurrentChange"
               layout="prev, pager, next"
+              :current-page="currentPage"
               :page-count="totalPageNumber">
             </el-pagination>
           </div>
         </div>
+        <div class="scommcon1">
+          <dl>
+            <dt class="tit">股票名称</dt>
+            <dd class="tit">影响程度及方向</dd>
+          </dl>
 
+          <dl v-for="item in fsmartSearchList">
+            <dt @click="showDialog(item)">{{item.name}}（{{item.code}}）</dt>
+            <dd v-html="numChangeStar(item.score)"></dd>
+          </dl>
+
+          <div class="pagebox" style="padding-left: 10px;">
+
+            <el-pagination
+              background
+              @current-change="fhandleCurrentChange"
+              layout="prev, pager, next"
+              :current-page="fcurrentPage"
+              :page-count="ftotalPageNumber">
+            </el-pagination>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -70,11 +90,18 @@
     </el-dialog>
 
     <el-dialog title="" :visible.sync="dialogFormVisible" align="center" width="416px" :style="{marginTop:'150px'}">
-      <span style="font-size: 14px;color: #042E58;letter-spacing: 0;">原料价格变动比例(%)</span>
-      <el-input v-model.number="flPriceChng" style="width: 120px;height: 30px;" type="number" :step="0.01"></el-input>
+      <span style="font-size: 14px;color: #042E58;letter-spacing: 0;">原料价格变动比例</span>
+      <el-input v-model="flPriceChng" style="width: 100px;height: 30px;" type="number" :step="0.01"></el-input>
+      (%)
       <div slot="footer" class="dialog-footer" style="text-align: center;">
-        <el-button @click="dialogFormVisible = false" style="width:80px;height:30px;border: 1px solid #042E58;font-size: 14px;color: #042E58;padding: 0;border-radius: 2px;">取 消</el-button>
-        <el-button type="primary" @click="search(0)" style="width:80px;height:30px;border: 1px solid #042E58;background:#042E58;font-size: 14px;color: #FFFFFF;padding: 0;border-radius: 2px;">确 定</el-button>
+        <el-button @click="dialogFormVisible = false"
+                   style="width:80px;height:30px;border: 1px solid #042E58;font-size: 14px;color: #042E58;padding: 0;border-radius: 2px;">
+          取 消
+        </el-button>
+        <el-button type="primary" @click="search(0)"
+                   style="width:80px;height:30px;border: 1px solid #042E58;background:#042E58;font-size: 14px;color: #FFFFFF;padding: 0;border-radius: 2px;">
+          确 定
+        </el-button>
       </div>
     </el-dialog>
 
@@ -84,7 +111,7 @@
 
 <script>
   import '@/styles/homePage.css'
-  import {smartSearch, smartSearchPage, smartSearchEdge,searchHintKeys} from '@/api/homePage'
+  import {smartSearch, smartSearchPage, smartSearchEdge, searchHintKeys} from '@/api/homePage'
   import processGo from '@/components/process-go'
   import NProgress from 'nprogress'
 
@@ -103,8 +130,11 @@
         dialogFormVisible: false,
         searchResultVisible: false,
         smartSearchList: [],
+        fsmartSearchList: [],
         totalPageNumber: 1,
+        ftotalPageNumber: 1,
         currentPage: 1,
+        fcurrentPage: 1,
         totalNum: 0,
         token: '',
         record: {
@@ -113,7 +143,8 @@
         },
         nDirectionSelect: '0',
         height: '',
-        flPriceChng: ''
+        flPriceChng: '',
+        pageSize: 10
       }
     },
     directives: {
@@ -126,11 +157,14 @@
       }
     },
     mounted() {
-      this.height = window.screen.availHeight - 100;
-      this.initSearchKeys("");
+      // this.height = window.screen.availHeight - 100;
+      // this.height = document.documentElement.clientHeight;
+      this.height = window.innerHeight
+      this.initSearchKeys("",function () {
+      });
     },
     methods: {
-      initSearchKeys(keyWords){
+      initSearchKeys(keyWords,callback) {
         searchHintKeys(keyWords).then(resp => {
           let respObj = resp.data;
           if (respObj.code != 1) {
@@ -145,16 +179,18 @@
             );
           }
 
-          if(this.keyWordsList.length > 5){
+          if (this.keyWordsList.length > 5) {
             this.$refs.sermess.style.height = "160px";
             this.$refs.sermess.style.overflow = "auto";
           }
-          if(this.keyWordsList.length == 0){
+          if (this.keyWordsList.length == 0) {
             this.$refs.sermess.style.display = 'none';
+          }else {
+            callback();
           }
         })
       },
-      fn(){
+      fn() {
         document.getElementById('sermess').style.display = "none";
         var si = document.getElementById('serinp');
         if (si.firstElementChild.firstElementChild.value == "") {
@@ -163,15 +199,20 @@
           si.className = "searchl focus"
         }
       },
-      openForm(){
+      openForm() {
         this.dialogFormVisible = true;
       },
-      handleCurrentChange(val){
+      handleCurrentChange(val) {
         this.currentPage = val;
-        this.openPage(val);
+        this.openPage('z');
+      },
+      fhandleCurrentChange(val) {
+        this.fcurrentPage = val;
+        this.openPage('f');
       },
       search(isFoc) {
         var that = this;
+
         if ((/^[\u4e00-\u9fa5]/g.test(this.shiftName) || this.shiftName.length > 0) && isFoc == 0) {
           NProgress.inc(0.2);
           NProgress.configure({easing: 'ease', speed: 500});
@@ -180,20 +221,26 @@
           this.initPage(this.shiftName, function () {
             that.$refs.sermess.style.display = 'none';
             that.$refs.s_search.className = "s_search s_ani_d";
-            that.$refs.serres.className = "home_width clearfix";
+            that.$refs.serres.className = "home_width1 clearfix";
 
             setTimeout(() => {
               NProgress.done();
               that.$refs.serres.style.display = 'block';
             }, 200)
 
-            that.height = window.screen.height;
+            that.height = window.innerHeight;
+            if (that.height < 660) {
+              that.height = that.height + 200;
+            }
+            if (that.height < 760) {
+              that.height = that.height + 100;
+            }
           });
         } else {
-          this.height = window.screen.availHeight - 100;
+          this.height = window.innerHeight;
           this.$refs.serres.style.display = 'none';
           this.$refs.s_search.className = "s_search s_ani_h";
-          this.$refs.serres.className = "home_width clearfix s_ani_sh0";
+          this.$refs.serres.className = "home_width1 clearfix s_ani_sh0";
           this.totalNum = 0;
         }
         this.dialogFormVisible = false;
@@ -204,8 +251,12 @@
         if (el.innerText != "" && el.innerText != undefined) {
           that.$refs.sermess.style.display = 'none';
         } else {
-          that.initSearchKeys(el.value);
-          that.$refs.sermess.style.display = 'block';
+          if (/^[\u4e00-\u9fa5]/g.test(el.value)) {
+            that.shiftName = el.value;
+            that.initSearchKeys(el.value,function () {
+              that.$refs.sermess.style.display = 'block';
+            });
+          }
         }
 
       },
@@ -222,11 +273,11 @@
         this.$refs.sermess.style.display = 'none';
         this.$refs.serinp.className = "searchl focus";
       },
-     /* enter(e) {
-        var el = e.target.value;
-        this.$refs.sermess.style.display = 'none';
-        this.search(0);
-      },*/
+      /* enter(e) {
+         var el = e.target.value;
+         this.$refs.sermess.style.display = 'none';
+         this.search(0);
+       },*/
       handleshow(e) {
         e.stopPropagation();
         e.cancelBubble = true;
@@ -236,19 +287,13 @@
         this.record.name = item.name;
         this.record.code = item.code;
         this.dialogTableVisible = true;
-        /*var that = this;
-        setTimeout(() => {
-          that.$refs.processGoPage.initData(function () {
-            this.$refs.processGoPage.load();
-          });
-        }, 200)*/
 
       },
       closeDialog() {
         this.dialogTableVisible = false;
       },
       initPage(searchValue, callback) {
-        smartSearch(this.nDirectionSelect, searchValue,this.flPriceChng).then(resp => {
+        smartSearch(this.pageSize, this.nDirectionSelect, searchValue, (this.flPriceChng / 100)).then(resp => {
           let respObj = resp.data;
           if (respObj.code != 1) {
             NProgress.done();
@@ -257,8 +302,11 @@
           }
           console.log("resp", resp)
           this.smartSearchList = respObj.data.nodes;
+          this.fsmartSearchList = respObj.data.fnodes;
           this.totalPageNumber = respObj.data.total_page;
+          this.ftotalPageNumber = respObj.data.ftotal_page;
           this.currentPage = respObj.data.current_page;
+          this.fcurrentPage = respObj.data.fcurrent_page;
 
           if (respObj.data.total_num != null) {
             this.totalNum = respObj.data.total_num;
@@ -268,11 +316,14 @@
 
           }
           this.token = respObj.data.token;
+          sessionStorage.clear();
           sessionStorage.setItem('token', this.token);
           callback();
+        }).catch(function (response) {
+          NProgress.done();
         })
       },
-      dealKeyWordsAndHistoricalRecord(searchValue){
+      dealKeyWordsAndHistoricalRecord(searchValue) {
         let keyWordFlag = false;
         let historyWordFlag = false;
 
@@ -316,90 +367,87 @@
         var fSpan = '<span class="f"></span>';
         var fbSpan = '<span class="fb"></span>';
 
-        if ((num < 0.5 && num > 0) || num == 0.0 || num == 0) {
+        if (num==0) {
           starHtml = span + span + span + span + span;
         }
         if (num == 0.5) {
           starHtml = zbSpan + span + span + span + span;
         }
-        if (num > 0.5 && num <= 1.0) {
+        if (num == 1) {
           starHtml = zSpan + span + span + span + span;
         }
         if (num == 1.5) {
           starHtml = zSpan + zbSpan + span + span + span;
         }
-        if (num > 1.5 && num <= 2.0) {
+        if (num == 2) {
           starHtml = zSpan + zSpan + span + span + span;
         }
         if (num == 2.5) {
           starHtml = zSpan + zSpan + zbSpan + span + span;
         }
-        if (num > 2.5 && num <= 3.0) {
+        if (num == 3) {
           starHtml = zSpan + zSpan + zSpan + span + span;
         }
         if (num == 3.5) {
-          starHtml = zSpan + zSpan + zbSpan + span + span;
+          starHtml = zSpan + zSpan + zSpan + zbSpan + span;
         }
-        if (num > 3.5 && num <= 4.0) {
+        if (num == 4) {
           starHtml = zSpan + zSpan + zSpan + zSpan + span;
         }
         if (num == 4.5) {
           starHtml = zSpan + zSpan + zSpan + zSpan + zbSpan;
         }
-        if (num > 4.5 && num <= 5.0) {
+        if (num == 5) {
           starHtml = zSpan + zSpan + zSpan + zSpan + zSpan;
         }
 
-        if (num == -0.5) {
+        if (num < 0 && num >= -0.5) {
           starHtml = fbSpan + span + span + span + span;
         }
-        if (num == -1.0) {
+        if (num < -0.5 && num > -1.5) {
           starHtml = fSpan + span + span + span + span;
         }
         if (num == -1.5) {
           starHtml = fSpan + fbSpan + span + span + span;
         }
-        if (num == -2.0) {
+        if (num < -1.5 && num > -2.5) {
           starHtml = fSpan + fSpan + span + span + span;
         }
         if (num == -2.5) {
           starHtml = fSpan + fSpan + fbSpan + span + span;
         }
-        if (num == -3.0) {
+        if (num < -2.5 && num > -3.5) {
           starHtml = fSpan + fSpan + fSpan + span + span;
         }
         if (num == -3.5) {
           starHtml = fSpan + fSpan + fSpan + fbSpan + span;
         }
-        if (num == -4.0) {
+        if (num <-3.5 && num > -4.5) {
           starHtml = fSpan + fSpan + fSpan + fSpan + span;
         }
         if (num == -4.5) {
           starHtml = fSpan + fSpan + fSpan + fSpan + fbSpan;
         }
-        if (num == -5.0) {
+        if (num < -4.5 && num >= -5.0) {
           starHtml = fSpan + fSpan + fSpan + fSpan + fSpan;
         }
 
         return starHtml;
       },
-      openPage(num) {
-        smartSearchPage(this.nDirectionSelect, num, this.token,this.flPriceChng).then(resp => {
+      openPage(zf) {
+        smartSearchPage(this.pageSize, this.nDirectionSelect, this.currentPage, this.fcurrentPage, this.token, this.flPriceChng).then(resp => {
           let respObj = resp.data;
-          this.smartSearchList = respObj.data.nodes;
-          this.totalPageNumber = respObj.data.total_page;
-          this.currentPage = parseInt(respObj.data.current_page);
+          if (zf =="z") {
+            this.smartSearchList = respObj.data.nodes;
+            this.totalPageNumber = respObj.data.total_page;
+            this.currentPage = parseInt(respObj.data.current_page);
+          }
+          if (zf =="f") {
+            this.fsmartSearchList = respObj.data.fnodes;
+            this.ftotalPageNumber = respObj.data.ftotal_page;
+            this.fcurrentPage = parseInt(respObj.data.fcurrent_page);
+          }
         })
-      },
-      nextPage() {
-        var num = this.currentPage + 1;
-
-        if (num > this.totalPageNumber) {
-          alert("已经到最后一页");
-          return false;
-        }
-
-        this.openPage(num);
       },
       openApi() {
         this.$router.push('/quantApi');

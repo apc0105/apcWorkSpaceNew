@@ -5,10 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.WebApplicationInitializer;
 
 @SpringBootApplication(scanBasePackages = { "com.news","ai.hual.sentiment","com.tk.ws","com.tk.quantization"})
 @EnableCaching
+@EnableScheduling
 public class NewsApplication extends SpringBootServletInitializer implements WebApplicationInitializer {
 
     @Override

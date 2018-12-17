@@ -5,6 +5,9 @@ public class WebNode {
 
     private String text;
 
+    //value ：User Supplier（default）
+    private String category;
+
     public String getKey() {
         return key;
     }
@@ -19,5 +22,13 @@ public class WebNode {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

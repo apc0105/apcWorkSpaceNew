@@ -26,7 +26,7 @@
           </tr>
           </thead>
           <tr v-for="item in quantMainPackages" >
-            <th class="thbb"><a :href="quantBaseUrl+item.packageRelativeAddress" class="fc">{{item.packageName}}</a></th>
+            <th class="thbb"><a :href="quantBaseUrl+item.packageRelativeAddress" class="fc down">{{item.packageName}}</a></th>
             <th class="thbb">{{item.packageVersion}}</th>
             <th class="thbb"><a :href="quantBaseUrl+item.docRelativeAddress" class="fc">{{item.docName}}</a></th>
           </tr>
@@ -34,7 +34,7 @@
             <th colspan="3" class="bot">
               <ul>
                 <li>依赖包</li>
-                <li v-for="item in quantDependencyPackages"><a :href="quantBaseUrl+item.packageRelativeAddress" class="fc">{{item.packageName}}</a>
+                <li v-for="item in quantDependencyPackages"><a :href="quantBaseUrl+item.packageRelativeAddress" class="fc down">{{item.packageName}}</a>
                 </li>
               </ul>
             </th>
@@ -101,7 +101,7 @@
     },
     methods: {
       initSetting() {
-        this.quantHeight = window.screen.availHeight - 100;
+        this.quantHeight = window.innerHeight;
         console.log('quantHeight', this.quantHeight);
       },
       initPackageType() {
@@ -133,7 +133,7 @@
         })
       },
       quantHandleBatchDownload() {
-        const aList = document.getElementsByTagName('a');
+        const aList =  document.getElementsByClassName("down");
         const data = [] // 需要下载打包的路径, 可以是本地相对路径, 也可以是跨域的全路径
         console.log("alist", aList)
         for (var i = 0; i < aList.length; i++) {

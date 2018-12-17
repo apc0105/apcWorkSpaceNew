@@ -5,9 +5,9 @@
       <div class="logotit"><img src="../../../assets/images/img_wenzi.png"/></div>
       <div class=" srcon clearfix" style="">
         <div ref="serinp" id="serinp" class="searchl" @click="handleshow($event)">
-          <el-input v-model="shiftName" @focus="handleInput($event)"
-                    @input.native="handleInput($event),search(1)">
-            <!--@keyup.enter.native="enter($event)" <!--@input.native="handleinput($event),search(1)"-->-->
+          <el-input v-model="shiftName" @focus="handleInput($event)" @input.native="handleInput($event),search(1)">
+            <!--@keyup.enter.native="enter($event)" <!--@input.native="handleinput($event),search(1)"-
+            onkeyup="this.value=this.value.replace(/[^\u4E00-\u9FA5]/g,'');"->-->
             <el-select v-model="nDirectionSelect" slot="prepend" placeholder="请选择"
                        style="width: 80px;background-color: #435a6c;">
               <el-option label="上游" value="1"></el-option>
@@ -38,7 +38,7 @@
           class="f">负面影响力</span></div>
         <div class="scommcon">
           <dl>
-            <dt class="tit">公司名称</dt>
+            <dt class="tit">股票名称</dt>
             <dd class="tit">影响程度及方向</dd>
           </dl>
 
@@ -48,12 +48,10 @@
           </dl>
 
           <div class="pagebox">
-            <!--            <a href="javascript:void(0);" v-for="(item,index) in totalPageNumber" :class="currentPage==item?'active':''"
-                           @click="openPage(item)">{{item}}</a>
-                        <a href="javascript:void(0);" class="next" @click="nextPage()">下一页</a>-->
             <el-pagination
               background
               @current-change="handleCurrentChange"
+              :current-page="currentPage"
               layout="prev, pager, next"
               :page-count="totalPageNumber">
             </el-pagination>
@@ -102,7 +100,9 @@
           code: ''
         },
         nDirectionSelect: '1',
-        height: ''
+        height: '',
+        flPriceChng: '',
+        pageSize: 10
       }
     },
     directives: {
@@ -116,11 +116,13 @@
       }
     },
     mounted() {
-      this.height = window.screen.availHeight - 100;
-      this.initSearchKeys("");
+      this.height = window.innerHeight;
+      this.initSearchKeys("",function () {
+      });
     },
     methods: {
-      initSearchKeys(keyWords) {
+      initSearchKeys(keyWords,callback) {
+
         searchHintKeys(keyWords).then(resp => {
           let respObj = resp.data;
           if (respObj.code != 1) {
@@ -135,13 +137,15 @@
             );
           }
 
-          if(this.keyWordsList.length > 5){
+          if (this.keyWordsList.length > 5) {
             this.$refs.sermess.style.height = "160px";
             this.$refs.sermess.style.overflow = "auto";
           }
 
-          if(this.keyWordsList.length == 0){
+          if (this.keyWordsList.length == 0) {
             this.$refs.sermess.style.display = 'none';
+          }else{
+            callback();
           }
 
         })
@@ -161,6 +165,7 @@
       },
       search(isFoc) {
         var that = this;
+
         if ((/^[\u4e00-\u9fa5]/g.test(this.shiftName) || this.shiftName.length > 0) && isFoc == 0) {
           NProgress.inc(0.2);
           NProgress.configure({easing: 'ease', speed: 500});
@@ -176,10 +181,16 @@
               that.$refs.serres.style.display = 'block';
             }, 200)
 
-            that.height = window.screen.height;
+            that.height = window.innerHeight;
+            if (that.height < 660) {
+              that.height = that.height + 200;
+            }
+            if (that.height < 760) {
+              that.height = that.height + 100;
+            }
           });
         } else {
-          this.height = window.screen.availHeight - 100;
+          this.height = window.innerHeight;
           this.$refs.serres.style.display = 'none';
           this.$refs.s_search.className = "s_search s_ani_h";
           this.$refs.serres.className = "home_width clearfix s_ani_sh0";
@@ -194,8 +205,12 @@
         if (el.innerText != "" && el.innerText != undefined) {
           that.$refs.sermess.style.display = 'none';
         } else {
-          that.initSearchKeys(el.value);
-          that.$refs.sermess.style.display = 'block';
+          if (/^[\u4e00-\u9fa5]/g.test(el.value)) {
+            that.shiftName = el.value;
+            that.initSearchKeys(el.value,function () {
+              that.$refs.sermess.style.display = 'block';
+            });
+          }
         }
 
       },
@@ -240,7 +255,7 @@
       },
       initPage(searchValue, callback) {
         var that = this;
-        smartSearch(this.nDirectionSelect, searchValue, 0).then(resp => {
+        smartSearch(this.pageSize, this.nDirectionSelect, searchValue, 0).then(resp => {
           let respObj = resp.data;
           if (respObj.code != 1) {
             NProgress.done();
@@ -261,11 +276,14 @@
 
           }
           this.token = respObj.data.token;
+          sessionStorage.clear();
           sessionStorage.setItem('token', this.token);
           callback();
+        }).catch(function (response) {
+          NProgress.done();
         })
       },
-      dealKeyWordsAndHistoricalRecord(searchValue){
+      dealKeyWordsAndHistoricalRecord(searchValue) {
         let keyWordFlag = false;
         let historyWordFlag = false;
 
@@ -310,31 +328,31 @@
         var fSpan = '<span class="f"></span>';
         var fbSpan = '<span class="fb"></span>';
 
-        if ((num < 0.5 && num > 0) || num == 0.0 || num == 0) {
+        if (num < 0.5 && num >= 0) {
           starHtml = span + span + span + span + span;
         }
         if (num == 0.5) {
           starHtml = zbSpan + span + span + span + span;
         }
-        if (num > 0.5 && num <= 1.0) {
+        if (num > 0.5 && num < 1.5) {
           starHtml = zSpan + span + span + span + span;
         }
         if (num == 1.5) {
           starHtml = zSpan + zbSpan + span + span + span;
         }
-        if (num > 1.5 && num <= 2.0) {
+        if (num > 1.5 && num < 2.5) {
           starHtml = zSpan + zSpan + span + span + span;
         }
         if (num == 2.5) {
           starHtml = zSpan + zSpan + zbSpan + span + span;
         }
-        if (num > 2.5 && num <= 3.0) {
+        if (num > 2.5 && num < 3.5) {
           starHtml = zSpan + zSpan + zSpan + span + span;
         }
         if (num == 3.5) {
-          starHtml = zSpan + zSpan + zbSpan + span + span;
+          starHtml = zSpan + zSpan + zSpan + zbSpan + span;
         }
-        if (num > 3.5 && num <= 4.0) {
+        if (num > 3.5 && num < 4.5) {
           starHtml = zSpan + zSpan + zSpan + zSpan + span;
         }
         if (num == 4.5) {
@@ -344,56 +362,45 @@
           starHtml = zSpan + zSpan + zSpan + zSpan + zSpan;
         }
 
-        if (num == -0.5) {
+        if (num < 0 && num >= -0.5) {
           starHtml = fbSpan + span + span + span + span;
         }
-        if (num == -1.0) {
+        if (num < -0.5 && num > -1.5) {
           starHtml = fSpan + span + span + span + span;
         }
         if (num == -1.5) {
           starHtml = fSpan + fbSpan + span + span + span;
         }
-        if (num == -2.0) {
+        if (num < -1.5 && num > -2.5) {
           starHtml = fSpan + fSpan + span + span + span;
         }
         if (num == -2.5) {
           starHtml = fSpan + fSpan + fbSpan + span + span;
         }
-        if (num == -3.0) {
+        if (num < -2.5 && num > -3.5) {
           starHtml = fSpan + fSpan + fSpan + span + span;
         }
         if (num == -3.5) {
           starHtml = fSpan + fSpan + fSpan + fbSpan + span;
         }
-        if (num == -4.0) {
+        if (num < -3.5 && num > -4.5) {
           starHtml = fSpan + fSpan + fSpan + fSpan + span;
         }
         if (num == -4.5) {
           starHtml = fSpan + fSpan + fSpan + fSpan + fbSpan;
         }
-        if (num == -5.0) {
+        if (num < -4.5 && num >= -5.0) {
           starHtml = fSpan + fSpan + fSpan + fSpan + fSpan;
         }
-
         return starHtml;
       },
       openPage(num) {
-        smartSearchPage(this.nDirectionSelect, num, this.token, 0).then(resp => {
+        smartSearchPage(this.pageSize, this.nDirectionSelect, num, 0, this.token, 0).then(resp => {
           let respObj = resp.data;
           this.smartSearchList = respObj.data.nodes;
           this.totalPageNumber = respObj.data.total_page;
           this.currentPage = parseInt(respObj.data.current_page);
         })
-      },
-      nextPage() {
-        var num = this.currentPage + 1;
-
-        if (num > this.totalPageNumber) {
-          alert("已经到最后一页");
-          return false;
-        }
-
-        this.openPage(num);
       },
       openApi() {
         this.$router.push('/api');

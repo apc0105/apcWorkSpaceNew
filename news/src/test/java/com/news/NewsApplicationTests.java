@@ -1,5 +1,6 @@
 package com.news;
 
+import com.mongodb.util.JSON;
 import com.news.model.ApiInfo;
 import com.news.model.SearchHintKeys;
 import com.news.model.WebNode;
@@ -99,6 +100,7 @@ public class NewsApplicationTests {
 		}
 
 
+
 		for(WebNode webNode:nodes){
 			System.out.println("------"+webNode.getKey()+"------"+webNode.getText()+"------");
 		}
@@ -109,7 +111,7 @@ public class NewsApplicationTests {
 
 		//testList();
 
-		addSearchHintKeys();
+		//addSearchHintKeys();
 	}
 	@Autowired
 	private ApiInfoService apiInfoService;

@@ -36,11 +36,9 @@
     methods: {
       load() {
         this.init();
-        console.log("endTime3", new Date().getMilliseconds())
-        //this.addNodeTemplate(this.User);
+        this.addNodeTemplate(this.User);
         this.addNodeTemplate(this.Supplier);
         this.layout();
-        console.log("endTime4", new Date().getMilliseconds())
       },
       layout() {
         this.myDiagram.model = go.Model.fromJson(this.myjson);
@@ -51,7 +49,7 @@
         // for conciseness in defining templates
 
         let options = {
-          yellowgrad: $(go.Brush, "Linear", {0: "rgb(254, 201, 0)", 1: "rgb(254, 162, 0)"}),
+          yellowgrad: $(go.Brush, "Linear", {0: "#FBB240", 1: "#FBB240"}),
           greengrad: $(go.Brush, "Linear", {0: "#98FB98", 1: "#9ACD32"}),
           bluegrad: $(go.Brush, "Linear", {0: "#B0E0E6", 1: "#87CEEB"}),
           redgrad: $(go.Brush, "Linear", {0: "#C45245", 1: "#871E1B"}),

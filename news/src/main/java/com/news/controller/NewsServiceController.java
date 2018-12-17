@@ -24,13 +24,13 @@ public class NewsServiceController {
      */
     @ResponseBody
     @PostMapping(value = "/SmartSearch")
-    public Response getSmartSearch(HttpServletRequest request, int nDirection, String token, String search_value,float flPriceChng) {
+    public Response getSmartSearch(HttpServletRequest request,int pageSize, int nDirection, String token, String search_value,float flPriceChng) {
 
         if (StringUtils.isEmpty(token)) {
             token = "NWS_" + request.getRemoteHost() + UUID.randomUUID().toString();
         }
 
-        return newsService.findNews(nDirection, token, search_value, 1,flPriceChng);
+        return newsService.findNews(nDirection, token, search_value, pageSize,1,1,flPriceChng);
 
     }
 
@@ -39,9 +39,9 @@ public class NewsServiceController {
      */
     @ResponseBody
     @PostMapping(value = "/SmartSearchPage")
-    public Response getSmartSearchPage(int nDirection,String token,int pageNumber,float flPriceChng) {
+    public Response getSmartSearchPage(int nDirection,String token,int pageSize,int pageNumber,int fPageNumber,float flPriceChng) {
 
-        return newsService.findNews(nDirection,token,"", pageNumber,flPriceChng);
+        return newsService.findNews(nDirection,token,"",pageSize, pageNumber,fPageNumber,flPriceChng);
 
     }
 

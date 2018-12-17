@@ -14,6 +14,10 @@ import global_ from './components/Global'
 import 'babel-polyfill'
 import 'es6-promise/auto'
 
+/*import promise from 'es6-promise';
+
+promise.polyfill();*/
+
 import {forwardWindowByAction, getSingleUrlParam,windowHrefByAction} from '@/utils/RequestLocationUrl'
 
 Vue.config.productionTip = false

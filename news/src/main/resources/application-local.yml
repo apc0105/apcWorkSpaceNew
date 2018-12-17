@@ -4,12 +4,14 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://mongo1:123456@10.130.213.163:27017/TKFINANCE?authMechanism=SCRAM-SHA-1
+      uri: mongodb://localhost:27017/news
+      username: mongodb
+      password:
   redis:
     # Redis数据库索引（默认为0）
     database: 0
     # Redis服务器地址
-    host: 10.130.217.180
+    host: 127.0.0.1
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
@@ -28,12 +30,14 @@ spring:
         timeout: 1000
 filePath:
   relativePath: /api/**
-  uploadPath: /usr/local/taibao/
+  uploadPath: D:/taibao/
 ##客户端接口地址
-clientUrl: http://10.130.213.159:8080/axis2/services/TKNewsService
-quantClientUrl: http://10.130.213.159:8080/axis2/services/TKQuantizationService
+clientUrl: http://localhost:8080/axis2/services/TKSearchService
 ##客户端数据配置
 nMaxNum: 300
 nMaxDepth: 10
 nOrderType: 0
 flWeightThreshold: 0
+
+fillterKeyWords: 上市公司股票,股转系统股票,其他公司
+

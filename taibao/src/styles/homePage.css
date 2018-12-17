@@ -40,6 +40,13 @@
   background-color: #fff;
 }
 
+.home_width1 {
+  overflow: hidden;
+  width: 900px;
+  margin: 10px -99px 20px;
+  background-color: #fff;
+}
+
 .scomm {
   position: relative;
   padding: 5px 20px;
@@ -89,7 +96,18 @@
   padding: 10px 0px 0px;
 }
 
+.scommcon1 {
+  width: 49%;
+  float: left;
+  padding: 10px 0px 0px;
+}
+
 .scommcon dl {
+  zoom: 1;
+  padding: 5px 0;
+}
+
+.scommcon1 dl {
   zoom: 1;
   padding: 5px 0;
 }
@@ -97,8 +115,19 @@
 .scommcon dl:hover {
   background-color: #f8f8f8;
 }
+.scommcon1 dl:hover {
+  background-color: #f8f8f8;
+}
 
 .scommcon dl:after {
+  display: block;
+  content: '';
+  clear: both;
+  height: 0;
+  font-size: 0;
+}
+
+.scommcon1 dl:after {
   display: block;
   content: '';
   clear: both;
@@ -116,12 +145,29 @@
   cursor: pointer;
   box-sizing: border-box;
 }
+.scommcon1 dl dt {
+  float: left;
+  width: 65%;
+  padding-left: 40px;
+  line-height: 24px;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
 
 .scommcon dl dd {
   float: left;
   width: 30%;
   height: 24px;
   padding-right: 40px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.scommcon1 dl dd {
+  float: left;
+  height: 24px;
   text-align: left;
   box-sizing: border-box;
 }
@@ -133,6 +179,7 @@
   margin-right: 5px;
   background: url(../assets/images/img_04.png) center no-repeat;
 }
+
 
 .scommcon dl dd span.z {
   background: url(../assets/images/img_01.png) center no-repeat;
@@ -174,27 +221,53 @@
   height: 40px;
 }
 
-.scommcon .pagebox a {
+.scommcon1 dl dd span {
   display: inline-block;
-  padding: 0 10px;
-  line-height: 26px;
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  background: url(../assets/images/img_04.png) center no-repeat;
+}
+
+
+.scommcon1 dl dd span.z {
+  background: url(../assets/images/img_01.png) center no-repeat;
+}
+
+.scommcon1 dl dd span.zb {
+  background: url(../assets/images/img_02.png) center no-repeat;
+}
+
+.scommcon1 dl dd span.f {
+  background: url(../assets/images/img_03.png) center no-repeat;
+}
+
+.scommcon1 dl dd span.fb {
+  background: url(../assets/images/img_05.png) center no-repeat;
+}
+
+.scommcon1 dl .k {
+  float: left;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border: #e1e1e1 solid 1px;
+  box-sizing: border-box;
+}
+
+.scommcon1 dl .tit {
+  line-height: 24px;
   font-size: 14px;
-  text-decoration: none;
-  color: #9d9d9d;
+  text-align: left;
+  font-weight: bold;
 }
 
-.scommcon .pagebox .active {
-  color: #fff;
-  background-color: #00aeb1;
-}
-
-.scommcon .pagebox a.next {
-  color: #020202;
-}
-
-.scommcon .pagebox li:hover {
-  color: #fff;
-  background-color: #00aeb1;
+.scommcon1 .pagebox {
+  margin-top: 10px;
+  padding: 8px 40px;
+  text-align: right;
+  background-color: #f8f8f8;
+  height: 40px;
 }
 
 .sou {

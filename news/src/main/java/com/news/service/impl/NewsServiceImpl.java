@@ -10,10 +10,14 @@ import com.news.model.WebNode;
 import com.news.service.NewsService;
 import com.news.support.Response;
 import com.news.util.RedisUtil;
+import com.news.util.SortList;
 import com.tk.quantization.TKQuantizationServiceClient;
 import com.tk.quantization.TKQuantizationServiceInferenceExceptionException;
 import com.tk.ws.TKNewsServiceClient;
 import com.tk.ws.TKNewsServiceInferenceExceptionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -26,38 +30,56 @@ import java.util.*;
 public class NewsServiceImpl implements NewsService {
 
     @Override
-    public Response findNews(int nDirection, String token, String search_value, int pageNumber,float flPriceChng) {
+    public Response findNews(int nDirection, String token, String search_value, int pageSize, int pageNumber, int fPageNumber, float flPriceChng) {
 
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
         InferenceResult[] results = getInferenceResults(nDirection, token, search_value, flPriceChng);
+
         if (results == null) {
             return Response.fail();
         }
-        int pageSize = 10;
-        List<NewsInfo> newsInfos = new ArrayList<NewsInfo>();
-        int currIdx = (pageNumber > 1 ? (pageNumber - 1) * pageSize : 0);
-        for (int i = 0; i < pageSize && i < results.length - currIdx; i++) {
-            NewsInfo newsInfo = new NewsInfo();
-            newsInfo.setName(results[currIdx + i].getName());
-            newsInfo.setCode(results[currIdx + i].getCode());
-            newsInfo.setScore(results[currIdx + i].getScore());
 
-            newsInfos.add(newsInfo);
+        List<NewsInfo> allInfo = new ArrayList<NewsInfo>();
+        for (int i = 0; i < results.length; i++) {
+            NewsInfo newsInfo = new NewsInfo();
+            newsInfo.setName(results[i].getName());
+            newsInfo.setCode(results[i].getCode());
+            newsInfo.setScore(results[i].getScore());
+            allInfo.add(newsInfo);
         }
 
-        int totalPageNum = (results.length + pageSize - 1) / pageSize;
+        List<NewsInfo> newsInfos = null;
+        List<NewsInfo> fnewsInfos = null;
+        int totalPageNum = 0;
+        int ftotalPageNum = 0;
+        if (ObjectUtils.isEmpty(flPriceChng) || flPriceChng == 0) {
+            newsInfos = getNewsInfoToPage(allInfo, pageNumber, pageSize);
+            totalPageNum = (results.length + pageSize - 1) / pageSize;
+        } else {
+            newsInfos = getNewsInfoToPage(getZNewsInfo(allInfo), pageNumber, pageSize);
+            totalPageNum = (getZNewsInfo(allInfo).size() + pageSize - 1) / pageSize;
+
+            fnewsInfos = getNewsInfoToPage(getFNewsInfo(allInfo), fPageNumber, pageSize);
+            ftotalPageNum = (getFNewsInfo(allInfo).size() + pageSize - 1) / pageSize;
+        }
 
         resultMap.put("nodes", newsInfos);
+        resultMap.put("fnodes", fnewsInfos);
+
         resultMap.put("current_page", pageNumber);
+        resultMap.put("fcurrent_page", fPageNumber);
+
         resultMap.put("total_page", totalPageNum);
+        resultMap.put("ftotal_page", ftotalPageNum);
+
         resultMap.put("total_num", results.length);
         resultMap.put("token", token);
 
         return Response.ok(resultMap);
     }
 
-    private InferenceResult[] getInferenceResults(int nDirection, String token, String search_value,float flPriceChng) {
+    private InferenceResult[] getInferenceResults(int nDirection, String token, String search_value, float flPriceChng) {
         InferenceResult[] results = null;
 
         String clientUrl = env.getProperty("clientUrl");
@@ -69,9 +91,13 @@ public class NewsServiceImpl implements NewsService {
 
         if (redisUtil.hasKey(token)) {
             results = (InferenceResult[]) redisUtil.get(token);
+
+            log.info("---------------from  to redis getdata start----");
+            log.info("---------------"+results);
+            log.info("---------------from  to redis getdata end----");
         } else {
             try {
-                if(ObjectUtils.isEmpty(flPriceChng)||flPriceChng==0){
+                if (ObjectUtils.isEmpty(flPriceChng) || flPriceChng == 0) {
                     TKNewsServiceClient client = new TKNewsServiceClient(clientUrl);
                     results = client.getRelatedCompaniesByKey(search_value, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
                 } else {
@@ -79,7 +105,11 @@ public class NewsServiceImpl implements NewsService {
                     results = quantizationServiceClient.getRelatedCompaniesByKey(search_value, flPriceChng, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
                 }
 
-                redisUtil.set(token, results, 1800);
+                redisUtil.set(token, results, 3600 * 24);
+
+                log.info("---------------from  to source getdata start----");
+                log.info("---------------"+results);
+                log.info("---------------from  to source getdata end----");
             } catch (RemoteException e) {
                 e.printStackTrace();
             } catch (TKNewsServiceInferenceExceptionException e) {
@@ -90,6 +120,50 @@ public class NewsServiceImpl implements NewsService {
         }
 
         return results;
+    }
+
+    //对List进行分页
+    private List<NewsInfo> getNewsInfoToPage(List<NewsInfo> list, int pageNumber, int pageSize) {
+
+        List<NewsInfo> newsInfos = new ArrayList<NewsInfo>();
+        int currIdx = (pageNumber > 1 ? (pageNumber - 1) * pageSize : 0);
+        for (int i = 0; i < pageSize && i < list.size() - currIdx; i++) {
+            NewsInfo ni = list.get(currIdx + i);
+
+            NewsInfo newsInfo = new NewsInfo();
+
+            BeanUtils.copyProperties(ni, newsInfo);
+
+            newsInfos.add(newsInfo);
+        }
+        return newsInfos;
+    }
+
+    //对List进行正反分类
+    //正
+    private List<NewsInfo> getZNewsInfo(List<NewsInfo> list) {
+
+        List<NewsInfo> newsInfos = new ArrayList<NewsInfo>();
+        for (NewsInfo info : list) {
+            if (info.getScore() >= 0) {
+                newsInfos.add(info);
+            }
+        }
+        sortList.Sort(newsInfos, "getScore", "desc");
+        return newsInfos;
+    }
+
+    //反
+    private List<NewsInfo> getFNewsInfo(List<NewsInfo> list) {
+
+        List<NewsInfo> newsInfos = new ArrayList<NewsInfo>();
+        for (NewsInfo info : list) {
+            if (info.getScore() < 0) {
+                newsInfos.add(info);
+            }
+        }
+        sortList.Sort(newsInfos, "getScore", "desc");
+        return newsInfos;
     }
 
 
@@ -115,18 +189,24 @@ public class NewsServiceImpl implements NewsService {
                         webNode.setKey(node.getName());
                         webNode.setText(node.getName());
 
-                        boolean flag=false;
+                        if (env.getProperty("fillterKeyWords").indexOf(node.getType()) > -1) {
+                            webNode.setCategory("User");
+                        } else {
+                            webNode.setCategory("Supplier");
+                        }
 
-                        if(!ObjectUtils.isEmpty(nodes)&&nodes.size()>0){
-                            for(WebNode node1:nodes){
-                                if(node1.getKey().equals(webNode.getKey())){
-                                    flag=true;
+                        boolean flag = false;
+
+                        if (!ObjectUtils.isEmpty(nodes) && nodes.size() > 0) {
+                            for (WebNode node1 : nodes) {
+                                if (node1.getKey().equals(webNode.getKey())) {
+                                    flag = true;
                                     break;
                                 }
                             }
                         }
 
-                        if(!flag){
+                        if (!flag) {
                             nodes.add(webNode);
                         }
                     }
@@ -152,4 +232,9 @@ public class NewsServiceImpl implements NewsService {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private SortList sortList;
+
+    private static Logger log = LoggerFactory.getLogger(NewsServiceImpl.class);
 }
