@@ -165,7 +165,7 @@
     },
     methods: {
       initSearchKeys(keyWords,callback) {
-        
+
         searchHintKeys(keyWords).then(resp => {
           let respObj = resp.data;
           if (respObj.code != 1) {

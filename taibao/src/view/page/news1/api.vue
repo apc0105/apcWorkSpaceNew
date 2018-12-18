@@ -52,6 +52,9 @@
   import '@/styles/api.css'
   import {getPackageTypes, getApiInfos} from '@/api/api'
 
+  import Promise from 'es6-promise'
+  Promise.polyfill();
+
   import axios from 'axios'
   import JSZip from 'jszip'
   import FileSaver from 'file-saver'
