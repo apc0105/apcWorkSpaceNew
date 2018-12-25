@@ -28,6 +28,7 @@ Vue.use(ElementUI)
 /* eslint-disable no-new */
 
 Vue.prototype.GLOBAL = global_
+
 axios.defaults.withCredentials=true
 
 new Vue({

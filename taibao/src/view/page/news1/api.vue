@@ -138,6 +138,7 @@
             return;
           }
           this.mainPackages = respObj.data.mainPackages;
+          this.dependencyPackages = [];
           if (respObj.data.dependencyPackages.length > 0) {
             this.dependencyPackages = respObj.data.dependencyPackages;
           }
@@ -146,11 +147,11 @@
       handleBatchDownload() {
         const aList = document.getElementsByClassName("down");
         const data = [] // 需要下载打包的路径, 可以是本地相对路径, 也可以是跨域的全路径
-        console.log("alist", aList)
+     /*   console.log("alist", aList)*/
         for (var i = 0; i < aList.length; i++) {
           data.push(aList[i].href)
         }
-        console.log("data", data)
+       /* console.log("data", data)*/
         const zip = new JSZip()
 
         const cache = {}

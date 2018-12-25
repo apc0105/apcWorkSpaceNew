@@ -10,7 +10,7 @@
                      onkeyup="this.value=this.value.replace(/[^\u4E00-\u9FA5]/g,'');"-->
             <!-- <el-select v-model="nDirectionSelect" slot="prepend" placeholder="请选择"
                         style="width: 80px;background-color: #435a6c;">
- <             <el-option label="上游" value="0"></el-option>
+                <el-option label="上游" value="0"></el-option>
                <el-option label="下游" value="0"></el-option>
              </el-select>-->
           </el-input>
@@ -128,7 +128,6 @@
         historicalRecordsListSize: 20,
         dialogTableVisible: false,
         dialogFormVisible: false,
-        searchResultVisible: false,
         smartSearchList: [],
         fsmartSearchList: [],
         totalPageNumber: 1,
@@ -165,7 +164,7 @@
     },
     methods: {
       initSearchKeys(keyWords,callback) {
-
+        
         searchHintKeys(keyWords).then(resp => {
           let respObj = resp.data;
           if (respObj.code != 1) {

@@ -52,6 +52,9 @@
   import '@/styles/api.css'
   import {getPackageTypes, getApiInfos} from '@/api/api'
 
+  import Promise from 'es6-promise'
+  Promise.polyfill();
+
   import axios from 'axios'
   import JSZip from 'jszip'
   import FileSaver from 'file-saver'
@@ -127,6 +130,7 @@
             return;
           }
           this.quantMainPackages = respObj.data.mainPackages;
+          this.quantDependencyPackages = [];
           if (respObj.data.dependencyPackages.length > 0) {
             this.quantDependencyPackages = respObj.data.dependencyPackages;
           }
@@ -135,11 +139,11 @@
       quantHandleBatchDownload() {
         const aList =  document.getElementsByClassName("down");
         const data = [] // 需要下载打包的路径, 可以是本地相对路径, 也可以是跨域的全路径
-        console.log("alist", aList)
+       /* console.log("alist", aList)*/
         for (var i = 0; i < aList.length; i++) {
           data.push(aList[i].href)
         }
-        console.log("data", data)
+    /*    console.log("data", data)*/
         const zip = new JSZip()
 
         const cache = {}
