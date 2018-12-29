@@ -1,5 +1,6 @@
 package com.news.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.news.model.SearchHintKeys;
 import com.news.service.SearchHintKeysService;
 import com.news.util.RedisUtil;
@@ -43,7 +44,7 @@ public class SearchHintKeysServiceImpl implements SearchHintKeysService {
 
         }
 
-        searchHintKeysList = (List<SearchHintKeys>) redisUtil.get("searchHintKeys");
+        searchHintKeysList = JSON.parseArray((String) redisUtil.get("searchHintKeys"),SearchHintKeys.class);
 
 //        log.info("---Get Data From Redis---------searchHintKeysList size---"+searchHintKeysList.size()+"-------");
 
@@ -73,7 +74,7 @@ public class SearchHintKeysServiceImpl implements SearchHintKeysService {
 
         if (searchHintKeysList.size() > 0) {
 
-            redisUtil.set("searchHintKeys", searchHintKeysList);
+            redisUtil.set("searchHintKeys", JSON.toJSONString(searchHintKeysList));
 
         }
 

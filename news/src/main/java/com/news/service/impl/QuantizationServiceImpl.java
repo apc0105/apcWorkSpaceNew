@@ -3,7 +3,6 @@ package com.news.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.news.model.NewsInfo;
 import com.news.model.Quantization;
 import com.news.service.QuantizationService;
 import com.news.support.Response;
@@ -15,18 +14,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service("quantizationService")
 public class QuantizationServiceImpl implements QuantizationService {
 
     @Override
     public Response findQuantizations(String days, int pageSize, int pageNumber, int fPageNumber, float floatNum, String subfield) {
+
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
         List<Quantization> newsInfos = null;
@@ -64,7 +60,7 @@ public class QuantizationServiceImpl implements QuantizationService {
     private List<Quantization> getQuantizationFromRedis(String days, float floatNum) {
 
         List<Quantization> list = JSON.parseArray(redisUtil.get(env.getProperty("quant.stocklist")).toString(), Quantization.class);
-        log.info("-------------------------from redis get data list---" + list + "-----");
+        log.info("-------------------------from redis get data list---" + list + "--size-" + list.size() + "--");
         List<Quantization> newList = new ArrayList<Quantization>();
 
         if (list != null && list.size() > 0) {
@@ -77,6 +73,7 @@ public class QuantizationServiceImpl implements QuantizationService {
             }
         }
 
+        log.info("------------------------- get data newList---" + newList + "--size-" + newList.size() + "--");
         return newList;
     }
 
@@ -128,11 +125,39 @@ public class QuantizationServiceImpl implements QuantizationService {
         }
 
         if (subfield.equals("1")) {
-            sortList.Sort(newsInfos, "getCorrelation", "desc");
+            //sortList.Sort(newsInfos, "getCorrelation", "desc");
+            Collections.sort(newsInfos, new Comparator() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    Quantization u1 = (Quantization) o1;
+                    Quantization u2 = (Quantization) o2;
+                    if (Math.abs(u1.getCorrelation()) < Math.abs(u2.getCorrelation())) {
+                        return 1;
+                    }
+                    if (Math.abs(u1.getCorrelation())> Math.abs(u2.getCorrelation())) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            });
         }
 
         if (subfield.equals("2")) {
-            sortList.Sort(newsInfos, "getUpsAndDowns", "desc");
+            // sortList.Sort(newsInfos, "getUpsAndDowns", "desc");
+            Collections.sort(newsInfos, new Comparator() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    Quantization u1 = (Quantization) o1;
+                    Quantization u2 = (Quantization) o2;
+                    if (Math.abs(u1.getUpsAndDowns()) < Math.abs(u2.getUpsAndDowns())) {
+                        return 1;
+                    }
+                    if (Math.abs(u1.getUpsAndDowns()) > Math.abs(u2.getUpsAndDowns())) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            });
         }
 
         return newsInfos;
@@ -143,7 +168,7 @@ public class QuantizationServiceImpl implements QuantizationService {
      */
     private float getCorrelationByCode(String code) {
         float correlation = 0;
-        correlation = (float) redisUtil.get(code + env.getProperty("quant.correlation"));
+        correlation = Float.parseFloat(redisUtil.get(code + env.getProperty("quant.correlation")).toString());
         return correlation;
     }
 
@@ -151,7 +176,7 @@ public class QuantizationServiceImpl implements QuantizationService {
         float upsAndDowns = 0;
         JSONArray xList = object.getJSONArray("x");
         JSONArray yList = object.getJSONArray("y");
-
+        log.info("------------------------- start--xList size-" + xList.size() + "--yList size-" + yList.size() + "--");
         for (int i = 0; i < xList.size(); i++) {
             float x = xList.getFloat(i);
             if (x == floatNum) {
@@ -159,19 +184,33 @@ public class QuantizationServiceImpl implements QuantizationService {
                 break;
             }
             if (x > floatNum) {
+                if (i == 0) {
+                    upsAndDowns = yList.getFloat(i);
+                    break;
+                }
+
                 float x1, x2, y1, y2;
-
+                log.info("------------------------- start--i-" + i);
                 x1 = xList.getFloat(i - 1);
+                log.info("------------------------- start--x1-" + x1);
                 x2 = x;
+                log.info("------------------------- start--x2-" + x2);
                 y1 = yList.getFloat(i - 1);
+                log.info("------------------------- start--y1-" + y1);
                 y2 = yList.getFloat(i);
+                log.info("------------------------- start--y2-" + y2);
 
-                upsAndDowns = (((y2 - y1) - (floatNum - x1)) / (x2 - x1)) + y1;
+                upsAndDowns = (((y2 - y1) * (floatNum - x1)) / (x2 - x1)) + y1;
 
                 break;
             }
+
+            if (x < floatNum && i == xList.size() - 1) {
+                upsAndDowns = yList.getFloat(i);
+                break;
+            }
         }
-        return upsAndDowns;
+        return upsAndDowns * 100;
     }
 
 
@@ -189,6 +228,7 @@ public class QuantizationServiceImpl implements QuantizationService {
 
         if (days.equals("1")) {
             JSONObject objectMulti = (JSONObject) JSON.parse(redisUtil.get(code + env.getProperty("quant.multidays")).toString());
+            log.info("------------------------- start--code-" + code + "--");
             upsAndDowns = getFloatValue(objectMulti, floatNum);
         }
 

@@ -52,14 +52,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.tk.quantization</groupId>
-            <artifactId>quantization</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/tkQuantizationServiceClient.jar</systemPath>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb</artifactId>
             <version>1.7.9</version>
@@ -82,11 +74,6 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.51</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.1.1</version>
         </dependency>
         <!--druid  fastjson  end-->
 

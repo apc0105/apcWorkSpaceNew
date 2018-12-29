@@ -1,6 +1,8 @@
 package com.tk.eventanalysis.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.tk.eventanalysis.model.AnalysisDetail;
 import com.tk.eventanalysis.model.EventAnalysis;
 import com.tk.eventanalysis.service.EventAnalysisService;
 import com.tk.eventanalysis.support.Response;
@@ -56,7 +58,7 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
             //  log.info("-----------upload end----------");
 
             //上传成功，调取接口
-            String requestUrl = env.getProperty("clientUrl") + filePath;
+            String requestUrl = env.getProperty("newsEventUrl") + filePath;
 
             //  log.info("-----------http start-----requestUrl--------"+requestUrl+"------");
 
@@ -110,7 +112,7 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
 
 
     /**
-     * 数据分页操作
+     * 事件分析数据分页操作
      */
     private List<EventAnalysis> getEventAnalysisPage(int pageNumber, int pageSize, List<EventAnalysis> list) {
 
@@ -121,7 +123,7 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
         for (int i = 0; i < pageSize && i < list.size() - currIdx; i++) {
             EventAnalysis eventAnalysis = new EventAnalysis();
 
-            EventAnalysis ea = list.get(currIdx+i);
+            EventAnalysis ea = list.get(currIdx + i);
 
             BeanUtils.copyProperties(ea, eventAnalysis);
 
@@ -129,6 +131,66 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
         }
 
         return eventAnalyses;
+    }
+
+    @Override
+    public Response getAnalysisDetail(int pageNumber, int pageSize, String uid, int index, String newstarget) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        String requestUrl = env.getProperty("newsDetailsUrl");
+
+        String jsonParameters= "{\"UID\":\"" +uid+ "\",\"index\":" +index+ ",\"newstarget\":\"" +newstarget+ "\"}";
+
+        String result = httpServiceUtil.executePost(requestUrl, jsonParameters);
+        log.info("-----------getAnalysisDetail result--------"+result+"-----------");
+
+        List<AnalysisDetail> list=new ArrayList<AnalysisDetail>();
+        List<AnalysisDetail> eventAnalysisDetailList=new ArrayList<AnalysisDetail>();
+        int totalPageNum=1;
+
+        if (!TypeChecker.isEmpty(result)) {
+            JSONObject object= (JSONObject) JSON.parse(result);
+
+            String UID=object.getString("UID");
+
+            log.info("-----------getAnalysisDetail UID--------"+UID+"-----------");
+
+            list= JSON.parseArray((String) redisUtil.get(UID),AnalysisDetail.class);
+
+            log.info("-----------getAnalysisDetail list--------"+list+"-----------");
+        }
+
+        if(list.size()>0){
+            eventAnalysisDetailList = getAnalysisDetailPage(pageNumber, pageSize, list);
+            totalPageNum = (list.size() + pageSize - 1) / pageSize;
+        }
+
+        resultMap.put("current_page", pageNumber);
+        resultMap.put("total_page", totalPageNum);
+        resultMap.put("eventAnalysisDetailList", eventAnalysisDetailList);
+        return Response.ok(resultMap);
+    }
+
+    /**
+     * 事件分析详情数据分页操作
+     */
+    private List<AnalysisDetail> getAnalysisDetailPage(int pageNumber, int pageSize, List<AnalysisDetail> list) {
+
+        List<AnalysisDetail> analysisDetails = new ArrayList<AnalysisDetail>();
+
+        int currIdx = (pageNumber > 1 ? (pageNumber - 1) * pageSize : 0);
+
+        for (int i = 0; i < pageSize && i < list.size() - currIdx; i++) {
+            AnalysisDetail analysisDetail = new AnalysisDetail();
+
+            AnalysisDetail detail = list.get(currIdx + i);
+
+            BeanUtils.copyProperties(detail, analysisDetail);
+
+            analysisDetails.add(analysisDetail);
+        }
+
+        return analysisDetails;
     }
 
     @Autowired

@@ -1,3 +1,7 @@
+/*import Promise from 'es6-promise'
+Promise.polyfill();*/
+import {Promise} from 'es6-promise-polyfill';
+
 import axios from 'axios'
 import {Message} from 'element-ui'
 import router from '@/router'

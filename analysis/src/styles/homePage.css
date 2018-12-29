@@ -119,7 +119,7 @@
   box-sizing: border-box;
 }
 
-.scommcon dl dd span {
+.logotit span,.scommcon dl dd span {
   display: inline-block;
   width: 20px;
   height: 20px;
@@ -127,19 +127,19 @@
   background: url(../assets/images/img_04.png) center no-repeat;
 }
 
-.scommcon dl dd span.z {
+.logotit span.z,.scommcon dl dd span.z {
   background: url(../assets/images/img_01.png) center no-repeat;
 }
 
-.scommcon dl dd span.zb {
+.logotit span.zb,.scommcon dl dd span.zb {
   background: url(../assets/images/img_02.png) center no-repeat;
 }
 
-.scommcon dl dd span.f {
+.logotit span.f,.scommcon dl dd span.f {
   background: url(../assets/images/img_03.png) center no-repeat;
 }
 
-.scommcon dl dd span.fb {
+.logotit span.fb,.scommcon dl dd span.fb {
   background: url(../assets/images/img_05.png) center no-repeat;
 }
 
@@ -156,7 +156,7 @@
   line-height: 24px;
   font-size: 14px;
   text-align: center;
-/*  width: 11%;*/
+  /*  width: 11%;*/
 }
 
 .scommcon .pagebox {
@@ -167,27 +167,12 @@
   height: 40px;
 }
 
-.scommcon .pagebox a {
-  display: inline-block;
-  padding: 0 10px;
-  line-height: 26px;
-  font-size: 14px;
-  text-decoration: none;
-  color: #9d9d9d;
-}
-
-.scommcon .pagebox .active {
-  color: #fff;
-  background-color: #00aeb1;
-}
-
-.scommcon .pagebox a.next {
-  color: #020202;
-}
-
-.scommcon .pagebox li:hover {
-  color: #fff;
-  background-color: #00aeb1;
+.scommcon .content {
+  float: none;
+  width: 85%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 .sou {
@@ -207,7 +192,7 @@
   margin: 0 auto;
 }
 
-.tableInfo table{
+.tableInfo table {
   box-sizing: border-box;
   padding: 0 10px
 }
@@ -221,9 +206,19 @@
   cursor: pointer;
 }
 
-.bd{
-  border-bottom: 0.5px  dashed  #979797;
+.bd {
+  border-bottom: 0.5px dashed #979797;
 }
-.lh_38{
+
+.lh_38 {
   line-height: 38px;
 }
+
+
+.back{
+  display: block;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+

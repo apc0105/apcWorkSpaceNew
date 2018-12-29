@@ -1,6 +1,5 @@
 package com.news;
 
-import com.mongodb.util.JSON;
 import com.news.model.ApiInfo;
 import com.news.model.SearchHintKeys;
 import com.news.model.WebNode;
@@ -32,7 +31,7 @@ public class NewsApplicationTests {
 	}
 
 	private void addInfo(){
-		ApiInfo apiInfo=new ApiInfo();
+/*		ApiInfo apiInfo=new ApiInfo();
 		apiInfo.setPackageType("Java");
 		apiInfo.setPackageName("java1测试.jar");
 		apiInfo.setPackageRelativeAddress("/api/package/3_测试.jar");
@@ -41,7 +40,20 @@ public class NewsApplicationTests {
 		apiInfo.setDocRelativeAddress("");
 		apiInfo.setDependencyPackage(true);
 
-		apiInfoService.saveApiInfo(apiInfo);
+		apiInfoService.saveApiInfo(apiInfo);*/
+
+		for(int i=0;i<5;i++){
+			ApiInfo apiInfo=new ApiInfo();
+			apiInfo.setPackageType("Python1");
+			apiInfo.setPackageName((i+1)+".py");
+			apiInfo.setPackageRelativeAddress("/api/package/"+(i+1)+".py");
+			apiInfo.setPackageVersion("1.0");
+			apiInfo.setDocName((i+1)+".pyAPI");
+			apiInfo.setDocRelativeAddress("");
+			apiInfo.setDependencyPackage(false);
+
+			apiInfoService.saveApiInfo(apiInfo);
+		}
 	}
 
 
@@ -112,6 +124,8 @@ public class NewsApplicationTests {
 		//testList();
 
 		//addSearchHintKeys();
+
+		addInfo();
 	}
 	@Autowired
 	private ApiInfoService apiInfoService;

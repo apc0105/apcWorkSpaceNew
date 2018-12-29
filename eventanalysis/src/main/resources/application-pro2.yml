@@ -3,7 +3,7 @@ spring:
     # Redis数据库索引（默认为0）
     database: 0
     # Redis服务器地址
-    host: 10.130.217.180
+    host: 100.126.64.154
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
@@ -26,6 +26,5 @@ newsEventUrl: http://127.0.0.1:5000/newsEvent?newspath=
 newsDetailsUrl: http://127.0.0.1:5000/newsDetails
 
 filePath:
-    relativePath: /api/**
-    uploadPath: /usr/local/taibao/temp/
-
+  relativePath: /api/**
+  uploadPath:  /usr/local/taibao/temp/

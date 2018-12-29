@@ -8,4 +8,6 @@ public interface EventAnalysisService {
     Response getAnalysisData(int pageNumber,int pageSize,String keyword);
 
     Response uploadFile(MultipartFile file);
+
+    Response getAnalysisDetail(int pageNumber, int pageSize, String uid, int index, String newstarget);
 }

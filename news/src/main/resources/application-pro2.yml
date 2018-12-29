@@ -30,7 +30,7 @@ filePath:
   relativePath: /api/**
   uploadPath: /usr/local/taibao/
 ##客户端接口地址
-clientUrl: http://10.130.106.111/axis2/services/TKNewsService
+clientUrl: http://100.126.64.151:8080/axis2/services/TKNewsService
 #quantClientUrl: http://10.130.218.175:8080/axis2/services/TKQuantizationService
 ##客户端数据配置
 nMaxNum: 300

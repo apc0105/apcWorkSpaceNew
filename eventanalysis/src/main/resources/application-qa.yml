@@ -21,7 +21,9 @@ spring:
         # 连接超时时间（毫秒）
         timeout: 1000
 
-clientUrl: http://127.0.0.1:5000/newsEvent?newspath=
+newsEventUrl: http://127.0.0.1:5000/newsEvent?newspath=
+
+newsDetailsUrl: http://127.0.0.1:5000/newsDetails
 
 filePath:
   relativePath: /api/**

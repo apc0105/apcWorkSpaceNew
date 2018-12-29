@@ -4,6 +4,7 @@ import ai.hual.sentiment.pojo.xsd.Edge;
 import ai.hual.sentiment.pojo.xsd.InferenceResult;
 import ai.hual.sentiment.pojo.xsd.Node;
 import ai.hual.sentiment.pojo.xsd.Route;
+import com.alibaba.fastjson.JSON;
 import com.news.model.NewsInfo;
 import com.news.model.NodeEdge;
 import com.news.model.WebNode;
@@ -11,8 +12,7 @@ import com.news.service.NewsService;
 import com.news.support.Response;
 import com.news.util.RedisUtil;
 import com.news.util.SortList;
-import com.tk.quantization.TKQuantizationServiceClient;
-import com.tk.quantization.TKQuantizationServiceInferenceExceptionException;
+
 import com.tk.ws.TKNewsServiceClient;
 import com.tk.ws.TKNewsServiceInferenceExceptionException;
 import org.slf4j.Logger;
@@ -34,18 +34,18 @@ public class NewsServiceImpl implements NewsService {
 
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
-        InferenceResult[] results = getInferenceResults(nDirection, token, search_value, flPriceChng);
+        List<InferenceResult> results = getInferenceResults(nDirection, token, search_value, flPriceChng);
 
         if (results == null) {
             return Response.fail();
         }
 
         List<NewsInfo> allInfo = new ArrayList<NewsInfo>();
-        for (int i = 0; i < results.length; i++) {
+        for (int i = 0; i < results.size(); i++) {
             NewsInfo newsInfo = new NewsInfo();
-            newsInfo.setName(results[i].getName());
-            newsInfo.setCode(results[i].getCode());
-            newsInfo.setScore(results[i].getScore());
+            newsInfo.setName(results.get(i).getName());
+            newsInfo.setCode(results.get(i).getCode());
+            newsInfo.setScore(results.get(i).getScore());
             allInfo.add(newsInfo);
         }
 
@@ -55,7 +55,7 @@ public class NewsServiceImpl implements NewsService {
         int ftotalPageNum = 0;
         if (ObjectUtils.isEmpty(flPriceChng) || flPriceChng == 0) {
             newsInfos = getNewsInfoToPage(allInfo, pageNumber, pageSize);
-            totalPageNum = (results.length + pageSize - 1) / pageSize;
+            totalPageNum = (results.size() + pageSize - 1) / pageSize;
         } else {
             newsInfos = getNewsInfoToPage(getZNewsInfo(allInfo), pageNumber, pageSize);
             totalPageNum = (getZNewsInfo(allInfo).size() + pageSize - 1) / pageSize;
@@ -73,14 +73,14 @@ public class NewsServiceImpl implements NewsService {
         resultMap.put("total_page", totalPageNum);
         resultMap.put("ftotal_page", ftotalPageNum);
 
-        resultMap.put("total_num", results.length);
+        resultMap.put("total_num", results.size());
         resultMap.put("token", token);
 
         return Response.ok(resultMap);
     }
 
-    private InferenceResult[] getInferenceResults(int nDirection, String token, String search_value, float flPriceChng) {
-        InferenceResult[] results = null;
+    private List<InferenceResult> getInferenceResults(int nDirection, String token, String search_value, float flPriceChng) {
+        List<InferenceResult> results = null;
 
         String clientUrl = env.getProperty("clientUrl");
         String quantClientUrl = env.getProperty("quantClientUrl");
@@ -90,31 +90,31 @@ public class NewsServiceImpl implements NewsService {
         int flWeightThreshold = Integer.parseInt(env.getProperty("flWeightThreshold"));
 
         if (redisUtil.hasKey(token)) {
-            results = (InferenceResult[]) redisUtil.get(token);
+
+            results = JSON.parseArray(redisUtil.get(token).toString(), InferenceResult.class);
 
             log.info("---------------from  to redis getdata start----");
-            log.info("---------------"+results);
+            log.info("---------------" + results);
             log.info("---------------from  to redis getdata end----");
         } else {
             try {
                 if (ObjectUtils.isEmpty(flPriceChng) || flPriceChng == 0) {
                     TKNewsServiceClient client = new TKNewsServiceClient(clientUrl);
-                    results = client.getRelatedCompaniesByKey(search_value, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
-                } else {
+                    results = Arrays.asList(client.getRelatedCompaniesByKey(search_value, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold));
+                }
+          /*      else {
                     TKQuantizationServiceClient quantizationServiceClient = new TKQuantizationServiceClient(quantClientUrl);
                     results = quantizationServiceClient.getRelatedCompaniesByKey(search_value, flPriceChng, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
-                }
+                }*/
 
-                redisUtil.set(token, results, 3600 * 24);
+                redisUtil.set(token, JSON.toJSONString(results), 3600 * 24);
 
                 log.info("---------------from  to source getdata start----");
-                log.info("---------------"+results);
+                log.info("---------------" + results);
                 log.info("---------------from  to source getdata end----");
             } catch (RemoteException e) {
                 e.printStackTrace();
             } catch (TKNewsServiceInferenceExceptionException e) {
-                e.printStackTrace();
-            } catch (TKQuantizationServiceInferenceExceptionException e) {
                 e.printStackTrace();
             }
         }
@@ -174,15 +174,15 @@ public class NewsServiceImpl implements NewsService {
         List<WebNode> nodes = new ArrayList<WebNode>();
         List<NodeEdge> edges = new ArrayList<NodeEdge>();
 
-        InferenceResult[] results = (InferenceResult[]) redisUtil.get(token);
+        List<InferenceResult> results = JSON.parseArray(redisUtil.get(token).toString(), InferenceResult.class);
 
         if (ObjectUtils.isEmpty(results)) {
             return Response.fail();
         }
 
-        for (int i = 0; i < results.length; i++) {
-            if (results[i].getCode().equals(code)) {
-                for (Route route : results[i].getRoutes()) {
+        for (int i = 0; i < results.size(); i++) {
+            if (results.get(i).getCode().equals(code)) {
+                for (Route route : results.get(i).getRoutes()) {
                     for (Node node : route.getNodes()) {
 
                         WebNode webNode = new WebNode();

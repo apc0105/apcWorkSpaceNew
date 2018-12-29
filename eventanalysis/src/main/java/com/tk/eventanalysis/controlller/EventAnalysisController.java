@@ -31,6 +31,14 @@ public class EventAnalysisController {
 
     }
 
+    @ResponseBody
+    @PostMapping(value = "/getAnalysisDetail")
+    public Response getAnalysisDetail(int pageNumber, int pageSize,String UID,int index,String newstarget) {
+
+        return eventAnalysisService.getAnalysisDetail(pageNumber,pageSize,UID,index,newstarget);
+
+    }
+
     @Autowired
     private EventAnalysisService eventAnalysisService;
 }

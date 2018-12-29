@@ -1,20 +1,15 @@
 package com.news.controller;
 
-import com.news.model.SearchHintKeys;
-import com.news.service.NewsService;
 import com.news.service.QuantizationService;
-import com.news.service.SearchHintKeysService;
+import com.news.service.impl.QuantizationServiceImpl;
 import com.news.support.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequestMapping(value = "/TKQuantization")
@@ -35,4 +30,6 @@ public class QuantizationController {
 
     @Autowired
     private QuantizationService quantizationService;
+
+    private static Logger log = LoggerFactory.getLogger(QuantizationController.class);
 }

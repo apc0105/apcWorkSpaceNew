@@ -4,6 +4,9 @@
 import 'babel-polyfill'
 import 'url-search-params-polyfill'
 import 'es6-promise/auto'
+import promise from 'es6-promise'
+promise.polyfill();
+
 import {Promise} from 'es6-promise-polyfill';
 
 import Vue from 'vue';

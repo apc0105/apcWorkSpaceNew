@@ -1,10 +1,10 @@
 <template>
-  <div class="main" :style="{height:height+'px'}">
+  <div class="main" :style="{height:height+'px'}" v-myOn:click="fn">
     <div ref="s_search" class="s_search">
       <div class="logotit"><img src="../../../assets/images/img_wenzi.png"/><span class="newWord">（原油量化）</span></div>
       <div class=" srcon clearfix" style="">
         <div ref="serinp" id="serinp" class="searchl">
-          <el-input v-model="shiftName" >
+          <el-input v-model="shiftName" :placeholder="days =='0'?'请输入-0.1到0.1之间数字':'请输入-0.5到0.5之间数字'">
             <el-select v-model="days" slot="prepend" placeholder="请选择" style="width: 80px;background-color: #435a6c;">
               <el-option label="一天" value="0"></el-option>
               <el-option label="多天" value="1"></el-option>
@@ -18,25 +18,29 @@
 
       <div ref="serres" class="home_width1 clearfix" style="display: none;">
         <div class="scomm1">泰宝为您找到受影响公司结果约 <em>{{totalNum}}</em> 个。
-          <el-radio-group v-model="subfield" @change="changeHandler" style="margin-left: 40%;" >
-            <el-radio class="radio" label="1">按相关性分栏</el-radio>
+          <el-radio-group v-model="subfield" @change="changeHandler" style="margin-left: 40%;">
             <el-radio class="radio" label="2">按涨跌幅分栏</el-radio>
+            <el-radio class="radio" label="1">按相关性分栏</el-radio>
           </el-radio-group>
         </div>
         <div class="scommcon1" style="border-right: 10px solid #f8f8f8;">
           <dl>
             <dt class="tit">股票名称</dt>
+            <dd class="tit">涨跌幅(%)</dd>
             <dd class="tit">相关性</dd>
-            <dd class="tit">涨跌幅</dd>
           </dl>
 
           <dl v-for="item in smartSearchList">
             <dt>{{item.name}}（{{item.code}}）</dt>
-            <dd>{{item.correlation}}</dd>
-            <dd>{{item.upsAndDowns}}</dd>
+            <dd :class="item.upsAndDowns >=0 ? 'z':'f'">{{numFilter(item.upsAndDowns)}}</dd>
+            <dd :class="item.correlation >=0 ? 'z':'f'">{{numFilter(item.correlation)}}</dd>
           </dl>
 
-
+          <!--   <dl >
+               <dt>中国石化（12345）</dt>
+               <dd class="z">{{numFilter(100)}}</dd>
+               <dd class="f">{{numFilter(-10)}}</dd>
+             </dl>-->
 
 
           <div class="pagebox" style="padding-left: 10px;">
@@ -53,14 +57,14 @@
         <div class="scommcon1">
           <dl>
             <dt class="tit">股票名称</dt>
+            <dd class="tit">涨跌幅(%)</dd>
             <dd class="tit">相关性</dd>
-            <dd class="tit">涨跌幅</dd>
           </dl>
 
           <dl v-for="item in fsmartSearchList">
-              <dt>{{item.name}}（{{item.code}}）</dt>
-            <dd>{{item.correlation}}</dd>
-            <dd>{{item.upsAndDowns}}</dd>
+            <dt>{{item.name}}（{{item.code}}）</dt>
+            <dd :class="item.upsAndDowns >=0 ? 'z':'f'">{{numFilter(item.upsAndDowns)}}</dd>
+            <dd :class="item.correlation >=0 ? 'z':'f'">{{numFilter(item.correlation)}}</dd>
           </dl>
 
           <div class="pagebox" style="padding-left: 10px;">
@@ -104,7 +108,17 @@
         days: '0',
         height: '',
         pageSize: 10,
-        subfield: "1"
+        subfield: "2"
+      }
+    },
+    directives: {
+      myOn: {
+        bind(el, binding, vnode) {
+          const event = binding.arg;
+          const fn = binding.value;
+          console.log(el);
+          el.addEventListener(event, fn);
+        }
       }
     },
     mounted() {
@@ -113,8 +127,27 @@
       this.height = window.innerHeight;
     },
     methods: {
-      changeHandler(val){
-        this.subfield=val;
+      fn() {
+        var si = document.getElementById('serinp');
+        if (si.firstElementChild.firstElementChild.value == "") {
+          si.className = "searchl"
+        } else {
+          si.className = "searchl focus"
+        }
+      },
+      numFilter(value) {
+
+        // 截取当前数据到小数点后两位
+
+        let realVal = Number(value).toFixed(3);
+
+        // num.toFixed(2)获取的是字符串
+
+        return Number(realVal)
+
+      },
+      changeHandler(val) {
+        this.subfield = val;
 
         this.search();
       },
@@ -131,9 +164,27 @@
 
         if (this.shiftName != null && this.shiftName != null) {
 
-          if(!this.isNumber(this.shiftName)){
+          if (!this.isNumber(this.shiftName)) {
             alert("文本框只能输入数字");
             return;
+          }
+
+          if (this.days == "0") {
+
+            if (this.shiftName < -0.1 || this.shiftName > 0.1) {
+              alert("请输入-0.1到0.1之间数字");
+              return;
+            }
+
+          }
+
+          if (this.days == "1") {
+
+            if (this.shiftName < -0.5 || this.shiftName > 0.5) {
+              alert("请输入-0.5到0.5之间数字");
+              return;
+            }
+
           }
 
           NProgress.inc(0.2);
@@ -206,13 +257,13 @@
           }
         })
       },
-      isNumber(val){
+      isNumber(val) {
 
         var regPos = /^\d+(\.\d+)?$/; //非负浮点数
         var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
-        if(regPos.test(val) || regNeg.test(val)){
+        if (regPos.test(val) || regNeg.test(val)) {
           return true;
-        }else{
+        } else {
           return false;
         }
       }
