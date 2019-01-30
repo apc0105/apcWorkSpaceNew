@@ -93,9 +93,6 @@ public class NewsServiceImpl implements NewsService {
 
             results = JSON.parseArray(redisUtil.get(token).toString(), InferenceResult.class);
 
-            log.info("---------------from  to redis getdata start----");
-            log.info("---------------" + results);
-            log.info("---------------from  to redis getdata end----");
         } else {
             try {
                 if (ObjectUtils.isEmpty(flPriceChng) || flPriceChng == 0) {
@@ -109,9 +106,6 @@ public class NewsServiceImpl implements NewsService {
 
                 redisUtil.set(token, JSON.toJSONString(results), 3600 * 24);
 
-                log.info("---------------from  to source getdata start----");
-                log.info("---------------" + results);
-                log.info("---------------from  to source getdata end----");
             } catch (RemoteException e) {
                 e.printStackTrace();
             } catch (TKNewsServiceInferenceExceptionException e) {

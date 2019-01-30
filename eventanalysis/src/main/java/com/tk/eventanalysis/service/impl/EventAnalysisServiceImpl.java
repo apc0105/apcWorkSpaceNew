@@ -37,16 +37,14 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
         try {
 
             String baseFilePath = env.getProperty("filePath.uploadPath");
-            // log.info("-----------upload start-----baseFilePath--------"+baseFilePath+"------");
             FileInputStream fs = (FileInputStream) file.getInputStream();
 
             String fileName = file.getOriginalFilename();
-            String suffix = fileName.substring(fileName.indexOf('.'), fileName.length());
+            String suffix = fileName.substring(fileName.lastIndexOf('.'), fileName.length());
 
             String filePath = System.currentTimeMillis() + suffix;
 
             File localfile = new File(baseFilePath + filePath);
-            //  log.info("-----------upload start-----localfile--------"+localfile+"------");
             FileOutputStream fos = new FileOutputStream(localfile);//上传地址
             byte[] buffer = new byte[1024];
             int len = 0;
@@ -55,23 +53,19 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
             }
             fos.close();
             fs.close();
-            //  log.info("-----------upload end----------");
 
             //上传成功，调取接口
             String requestUrl = env.getProperty("newsEventUrl") + filePath;
 
-            //  log.info("-----------http start-----requestUrl--------"+requestUrl+"------");
 
             String result = httpServiceUtil.executePost(requestUrl, "");
 
-            //  log.info("-----------http result----------"+result+"--------");
 
             if (!TypeChecker.isEmpty(result)) {
 
                 resultMap.put("actives", JSON.parse(result));
 
             }
-            //  log.info("-----------http end-------------------");
         } catch (IOException e) {
             e.printStackTrace();
 
@@ -87,17 +81,13 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
     @Override
     public Response getAnalysisData(int pageNumber, int pageSize, String keyword) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
-        //  log.info("-----------rediskey keyword--------"+keyword+"-----------");
 
         if (!redisUtil.hasKey(keyword)) {
-            //    log.info("-----------rediskey null-------------------");
             return Response.fail();
         }
-        //  log.info("-----------redisValue------------"+redisUtil.get(keyword)+"-------");
 
         List<EventAnalysis> list = JSON.parseArray(redisUtil.get(keyword).toString(), EventAnalysis.class);
 
-        //  log.info("-----------listValue------------"+list+"-------");
 
         List<EventAnalysis> eventAnalysisList = getEventAnalysisPage(pageNumber, pageSize, list);
 
@@ -142,7 +132,6 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
         String jsonParameters= "{\"UID\":\"" +uid+ "\",\"index\":" +index+ ",\"newstarget\":\"" +newstarget+ "\"}";
 
         String result = httpServiceUtil.executePost(requestUrl, jsonParameters);
-        log.info("-----------getAnalysisDetail result--------"+result+"-----------");
 
         List<AnalysisDetail> list=new ArrayList<AnalysisDetail>();
         List<AnalysisDetail> eventAnalysisDetailList=new ArrayList<AnalysisDetail>();
@@ -153,11 +142,8 @@ public class EventAnalysisServiceImpl implements EventAnalysisService {
 
             String UID=object.getString("UID");
 
-            log.info("-----------getAnalysisDetail UID--------"+UID+"-----------");
-
             list= JSON.parseArray((String) redisUtil.get(UID),AnalysisDetail.class);
 
-            log.info("-----------getAnalysisDetail list--------"+list+"-----------");
         }
 
         if(list.size()>0){

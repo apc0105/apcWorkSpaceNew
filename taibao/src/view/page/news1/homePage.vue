@@ -105,6 +105,11 @@
         pageSize: 10
       }
     },
+    beforeCreate: function() {
+      if(this.$route.name == 'homePage'){
+        document.body.setAttribute("class","addBackGround");
+      }
+    },
     directives: {
       myOn: {
         bind(el, binding, vnode) {
@@ -116,6 +121,7 @@
       }
     },
     mounted() {
+
       this.height = window.innerHeight;
       this.initSearchKeys("", function () {
       });
@@ -243,7 +249,7 @@
         this.dialogTableVisible = true;
         /*var that = this;
         setTimeout(() => {
-          that.$refs.processGoPage.initData(function () {
+          that.$refs.  .initData(function () {
             this.$refs.processGoPage.load();
           });
         }, 200)*/
@@ -402,6 +408,7 @@
         })
       },
       openApi() {
+        document.body.removeAttribute("class","addBackGround");
         this.$router.push('/api');
       }
     }

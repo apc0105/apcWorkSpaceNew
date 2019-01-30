@@ -33,7 +33,6 @@ public class HttpServiceUtil {
         client.getHttpConnectionManager().getParams().setSoTimeout(50000);
 
         // 使用POST方法
-        log.info("request url-->" + url + " post params-->" + param1);
         PostMethod method = new PostMethod(url);
         RequestEntity requestEntity = new StringRequestEntity(param1, "text/xml", "UTF-8");
         method.setRequestEntity(requestEntity);
@@ -45,16 +44,13 @@ public class HttpServiceUtil {
             String location = null;
             if (locationHeader != null) {
                 location = locationHeader.getValue();
-                log.info("页面跳转:" + location);
                 return execute(location, param1);// 用跳转后的页面重新请求。
             } else {
                 // 释放连接
                 method.releaseConnection();
-                log.info("本地跳转失败路径为空.");
             }
         } else {
             // 打印服务器返回的状态
-            log.info(method.getStatusText());
             // 打印返回的信息
             InputStream stream = method.getResponseBodyAsStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
@@ -63,7 +59,6 @@ public class HttpServiceUtil {
             while (null != (line = br.readLine())) {
                 buf.append(line).append("\n");
             }
-            log.info(buf.toString());
             // 释放连接
             method.releaseConnection();
             return buf.toString();
@@ -84,7 +79,6 @@ public class HttpServiceUtil {
 
             response = response.replace(":null", ":\"\"");
 
-            log.info("response:" + response);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,7 +101,6 @@ public class HttpServiceUtil {
 
             response = response.replace(":null", ":\"\"");
 
-            log.info("response:" + response);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -136,7 +129,6 @@ public class HttpServiceUtil {
 
             response = response.replace(":null", ":\"\"");
 
-            log.info("response:" + response);
             return response;
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,7 +154,6 @@ public class HttpServiceUtil {
         if (StringUtils.isEmpty(str.toString())) {
             throw new Exception("参数没有传递给接口！没有获取到参数！");
         }
-        log.info("uri*************-->" + uri + ";params*****************-->" + str);
     }
 
     /**

@@ -30,23 +30,19 @@ public class SearchHintKeysServiceImpl implements SearchHintKeysService {
 
     @Override
     public List<SearchHintKeys> findByKey(String keyWords) {
-//        log.info("------start findByKey---"+keyWords+"--------");
 
         List<SearchHintKeys> searchHintKeysList = new ArrayList<SearchHintKeys>();
 
         List<SearchHintKeys> results = new ArrayList<SearchHintKeys>();
 
-//        log.info("---Redis haskey---"+redisUtil.hasKey("searchHintKeys")+"-----------");
 
         if (!redisUtil.hasKey("searchHintKeys")) {
-//            log.info("---Redis is null---start saveToRedis-----------");
             saveSearchHintKeysToRedis();
 
         }
 
         searchHintKeysList = JSON.parseArray((String) redisUtil.get("searchHintKeys"),SearchHintKeys.class);
 
-//        log.info("---Get Data From Redis---------searchHintKeysList size---"+searchHintKeysList.size()+"-------");
 
         if (StringUtils.isEmpty(keyWords)) {
             return searchHintKeysList;
@@ -70,7 +66,6 @@ public class SearchHintKeysServiceImpl implements SearchHintKeysService {
 
         List<SearchHintKeys> searchHintKeysList = findAll();
 
-//        log.info("---before save to Redis ---Get list size----"+searchHintKeysList.size()+"-------");
 
         if (searchHintKeysList.size() > 0) {
 
@@ -78,7 +73,6 @@ public class SearchHintKeysServiceImpl implements SearchHintKeysService {
 
         }
 
-//        log.info("---Redis save success---end saveToRedis-----------");
     }
 
     @Autowired

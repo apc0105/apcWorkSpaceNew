@@ -17,8 +17,6 @@ import 'nprogress/nprogress.css'
 import axios from 'axios'
 import global_ from './components/Global'
 
-import {forwardWindowByAction, getSingleUrlParam,windowHrefByAction} from '@/utils/RequestLocationUrl'
-
 Vue.config.productionTip = false
 
 Vue.prototype.baseUrl=process.env.BASE_API;

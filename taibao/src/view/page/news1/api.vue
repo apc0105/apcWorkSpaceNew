@@ -99,6 +99,11 @@
         baseUrl: this.baseUrl
       }
     },
+    beforeCreate: function() {
+      if(this.$route.name == 'api'){
+        document.body.removeAttribute("class","addBackGround");
+      }
+    },
     mounted() {
       this.initSetting();
       this.initPackageType();

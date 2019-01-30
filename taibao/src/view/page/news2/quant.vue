@@ -121,6 +121,11 @@
         }
       }
     },
+    beforeCreate: function() {
+      if(this.$route.name == 'quant'){
+        document.body.setAttribute("class","addBackGround");
+      }
+    },
     mounted() {
       // this.height = window.screen.availHeight - 100;
       // this.height = document.documentElement.clientHeight;

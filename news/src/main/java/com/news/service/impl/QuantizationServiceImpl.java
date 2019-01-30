@@ -60,7 +60,6 @@ public class QuantizationServiceImpl implements QuantizationService {
     private List<Quantization> getQuantizationFromRedis(String days, float floatNum) {
 
         List<Quantization> list = JSON.parseArray(redisUtil.get(env.getProperty("quant.stocklist")).toString(), Quantization.class);
-        log.info("-------------------------from redis get data list---" + list + "--size-" + list.size() + "--");
         List<Quantization> newList = new ArrayList<Quantization>();
 
         if (list != null && list.size() > 0) {
@@ -73,7 +72,6 @@ public class QuantizationServiceImpl implements QuantizationService {
             }
         }
 
-        log.info("------------------------- get data newList---" + newList + "--size-" + newList.size() + "--");
         return newList;
     }
 
@@ -176,7 +174,6 @@ public class QuantizationServiceImpl implements QuantizationService {
         float upsAndDowns = 0;
         JSONArray xList = object.getJSONArray("x");
         JSONArray yList = object.getJSONArray("y");
-        log.info("------------------------- start--xList size-" + xList.size() + "--yList size-" + yList.size() + "--");
         for (int i = 0; i < xList.size(); i++) {
             float x = xList.getFloat(i);
             if (x == floatNum) {
@@ -190,15 +187,10 @@ public class QuantizationServiceImpl implements QuantizationService {
                 }
 
                 float x1, x2, y1, y2;
-                log.info("------------------------- start--i-" + i);
                 x1 = xList.getFloat(i - 1);
-                log.info("------------------------- start--x1-" + x1);
                 x2 = x;
-                log.info("------------------------- start--x2-" + x2);
                 y1 = yList.getFloat(i - 1);
-                log.info("------------------------- start--y1-" + y1);
                 y2 = yList.getFloat(i);
-                log.info("------------------------- start--y2-" + y2);
 
                 upsAndDowns = (((y2 - y1) * (floatNum - x1)) / (x2 - x1)) + y1;
 
@@ -228,7 +220,6 @@ public class QuantizationServiceImpl implements QuantizationService {
 
         if (days.equals("1")) {
             JSONObject objectMulti = (JSONObject) JSON.parse(redisUtil.get(code + env.getProperty("quant.multidays")).toString());
-            log.info("------------------------- start--code-" + code + "--");
             upsAndDowns = getFloatValue(objectMulti, floatNum);
         }
 
