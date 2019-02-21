@@ -25,7 +25,10 @@ a,img,button,input,textarea{-webkit-tap-highlight-color:transparent;}
   color: #333;
 }
 
-body{margin:0;}
+body{
+  margin:0;
+  min-width: 960px;
+}
 body.bg_gray{background-color: #f2f2f2;}
 
 body > .el-container {
@@ -135,5 +138,10 @@ body > .el-container {
 }
 .mr_40{
   margin-right: 40px;
+}
+
+.addBackGround{
+  background:#0f233d url(../assets/images/bg.jpg) top left no-repeat;
+  background-size:cover;
 }
 

@@ -1,10 +1,5 @@
 @charset "utf-8";
 
-.main {
-  background:#0f233d url(../assets/images/bg.jpg) top left no-repeat;
-  background-size:cover;
-  width: 100%;
-}
 .el-dialog__body {
   padding: 10px 30px 30px;
 }

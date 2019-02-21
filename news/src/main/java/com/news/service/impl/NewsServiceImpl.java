@@ -97,14 +97,18 @@ public class NewsServiceImpl implements NewsService {
             try {
                 if (ObjectUtils.isEmpty(flPriceChng) || flPriceChng == 0) {
                     TKNewsServiceClient client = new TKNewsServiceClient(clientUrl);
-                    results = Arrays.asList(client.getRelatedCompaniesByKey(search_value, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold));
+                    InferenceResult[] inferenceResults = client.getRelatedCompaniesByKey(search_value, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
+
+                    if (!ObjectUtils.isEmpty(inferenceResults) && inferenceResults.length > 0) {
+                        results = Arrays.asList(inferenceResults);
+
+                        redisUtil.set(token, JSON.toJSONString(results), 3600 * 24);
+                    }
                 }
           /*      else {
                     TKQuantizationServiceClient quantizationServiceClient = new TKQuantizationServiceClient(quantClientUrl);
                     results = quantizationServiceClient.getRelatedCompaniesByKey(search_value, flPriceChng, nMaxNum, nMaxDepth, nOrderType, nDirection, flWeightThreshold);
                 }*/
-
-                redisUtil.set(token, JSON.toJSONString(results), 3600 * 24);
 
             } catch (RemoteException e) {
                 e.printStackTrace();
